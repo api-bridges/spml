@@ -58,4 +58,8 @@ export const KEYWORDS = new Set([
   'email',
   'length',
   'limit',
+  'String',
+  'Number',
+  'Boolean',
+  'Date',
 ]);

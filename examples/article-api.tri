@@ -1,0 +1,33 @@
+server port 3000
+
+database connect "mongodb://localhost/cms"
+
+middleware cors
+middleware logs
+
+route GET /articles
+  paginate article limit 10
+  return articles
+
+route POST /articles
+  auth required
+  take title, content, published: Boolean
+  require title, content
+  create article with title, content, published: Boolean
+  return article
+
+route GET /articles/:id
+  find article by id
+  if not found return error "Article not found" status 404
+  return article
+
+route PUT /articles/:id
+  auth required
+  take title, content, published: Boolean
+  update article with title, content, published: Boolean
+  return ok
+
+route DELETE /articles/:id
+  auth required
+  delete article by id
+  return ok
