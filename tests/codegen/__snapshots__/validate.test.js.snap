@@ -1,0 +1,8 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`generateValidate() email rule matches snapshot 1`] = `
+"const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
+if (!emailRegex.test(email)) return res.status(400).json({ error: 'Invalid email address' });"
+`;
+
+exports[`generateValidate() minLength rule matches snapshot 1`] = `"if (password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' });"`;
