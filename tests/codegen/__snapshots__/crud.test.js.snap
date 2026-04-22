@@ -10,6 +10,13 @@ exports[`generateCrudStatements() Populate node — find → populate → return
 return res.json({ post });"
 `;
 
+exports[`generateCrudStatements() Update node — PATCH (selective $set) matches PATCH update snapshot 1`] = `
+"const updates = {};
+if (req.body.title !== undefined) updates.title = req.body.title;
+if (req.body.body !== undefined) updates.body = req.body.body;
+await Post.findByIdAndUpdate(req.params.id, { $set: updates }, { new: true });"
+`;
+
 exports[`generateCrudStatements() matches combined CRUD flow snapshot 1`] = `
 "const { title, body } = req.body;
 if (!title) return res.status(400).json({ error: 'Missing required fields: title' });

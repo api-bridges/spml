@@ -139,16 +139,44 @@ function generateCreate(node) {
 }
 
 /**
- * Generate code for an UpdateNode.
+ * Generate code for an UpdateNode — full-replace path (PUT routes).
  * Trionary: `update post with title, body`
- * Output:   await post.updateOne({ _id: req.params.id }, { ...req.body });
+ * Output:   await Post.updateOne({ _id: req.params.id }, { ...req.body });
  *
- * @param {{ type: 'Update', model: string, fields: string[] }} node
+ * @param {{ type: 'Update', model: string, fields: Array<string|{name:string}> }} node
  * @returns {string}
  */
 function generateUpdate(node) {
   const Model = capitalise(node.model);
   return `await ${Model}.updateOne({ _id: req.params.id }, { ...req.body });`;
+}
+
+/**
+ * Generate code for an UpdateNode — selective `$set` path (PATCH routes).
+ * Only fields that are explicitly present in `req.body` are written to the
+ * database, enabling true partial-update semantics.
+ *
+ * Trionary: `update post with title, body`  (inside a PATCH route)
+ * Output:
+ *   const updates = {};
+ *   if (req.body.title !== undefined) updates.title = req.body.title;
+ *   if (req.body.body !== undefined) updates.body = req.body.body;
+ *   await Post.findByIdAndUpdate(req.params.id, { $set: updates }, { new: true });
+ *
+ * @param {{ type: 'Update', model: string, fields: Array<string|{name:string}> }} node
+ * @returns {string}
+ */
+function generatePatchUpdate(node) {
+  const Model = capitalise(node.model);
+  const rawFields = Array.isArray(node.fields) ? node.fields : [];
+  const fieldNames = rawFields.map((f) => (typeof f === 'string' ? f : f.name));
+
+  const lines = [`const updates = {};`];
+  for (const field of fieldNames) {
+    lines.push(`if (req.body.${field} !== undefined) updates.${field} = req.body.${field};`);
+  }
+  lines.push(`await ${Model}.findByIdAndUpdate(req.params.id, { $set: updates }, { new: true });`);
+  return lines.join('\n');
 }
 
 /**
@@ -234,9 +262,11 @@ function generateIf(node, modelName) {
  *
  * @param {Array<object>} statementsArray - AST nodes from a route body.
  * @param {string} [modelName] - Inferred model name for the route (e.g. 'post').
+ * @param {string} [routeMethod] - HTTP method of the enclosing route (e.g. 'PATCH', 'PUT').
+ *   When 'PATCH', UpdateNodes emit selective `$set` logic instead of full-replace.
  * @returns {string} Generated Node.js source code, one statement per block.
  */
-export function generateCrudStatements(statementsArray, modelName) {
+export function generateCrudStatements(statementsArray, modelName, routeMethod) {
   registerCrudImports();
 
   const lines = [];
@@ -275,7 +305,9 @@ export function generateCrudStatements(statementsArray, modelName) {
         break;
 
       case 'Update':
-        lines.push(generateUpdate(node));
+        lines.push(
+          routeMethod === 'PATCH' ? generatePatchUpdate(node) : generateUpdate(node),
+        );
         break;
 
       case 'Delete':

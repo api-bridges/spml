@@ -121,7 +121,7 @@ export function compile(source) {
           handlerBody = generateAuthStatements(node.body);
         } else {
           const modelName = inferModelName(node.path);
-          handlerBody = generateCrudStatements(node.body, modelName);
+          handlerBody = generateCrudStatements(node.body, modelName, node.method);
         }
 
         routeSection.push(
