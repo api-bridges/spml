@@ -213,9 +213,15 @@ class Parser {
         case 'paginate': return this.parsePaginate();
       }
     }
-    // Escape hatch is introduced by the identifier 'escape'
-    if (t.type === TOKEN_TYPES.IDENTIFIER && t.value === 'escape') {
-      return this.parseEscapeHatch();
+    // Escape hatch: `js:` block or legacy `escape` identifier
+    if (t.type === TOKEN_TYPES.IDENTIFIER) {
+      if (t.value === 'escape') return this.parseEscapeHatch();
+      if (t.value === 'js') {
+        const next = this.tokens[this.pos + 1];
+        if (next && next.type === TOKEN_TYPES.OPERATOR && next.value === ':') {
+          return this.parseEscapeHatch();
+        }
+      }
     }
     throw { message: `Unexpected statement token: ${t.type}(${t.value})`, line: t.line, col: t.col, source: 'parser' };
   }
@@ -405,10 +411,22 @@ class Parser {
     return PaginateNode(targetToken.value, parseNumber(limitToken));
   }
 
+  // js:
+  //   <raw js block>
+  // or legacy:
   // escape
-  //   <raw js tokens...>
+  //   <raw js block>
   parseEscapeHatch() {
-    this.advance(); // consume 'escape' identifier
+    const startToken = this.peek();
+    const line = startToken.line;
+
+    if (startToken.value === 'js') {
+      this.advance(); // consume 'js'
+      this.expect(TOKEN_TYPES.OPERATOR, ':'); // consume ':'
+    } else {
+      this.advance(); // consume 'escape'
+    }
+
     this.consumeNewline();
     const parts = [];
     if (this.check(TOKEN_TYPES.INDENT)) {
@@ -422,13 +440,13 @@ class Parser {
         }
       }
       if (this.check(TOKEN_TYPES.DEDENT)) this.advance();
-      return EscapeHatchNode(parts.join('').trim());
+      return EscapeHatchNode(parts.join('').trim(), line);
     } else {
       while (!this.isLineEnd()) {
         parts.push(this.advance().value);
       }
       this.consumeNewline();
-      return EscapeHatchNode(parts.join(' ').trim());
+      return EscapeHatchNode(parts.join(' ').trim(), line);
     }
   }
 

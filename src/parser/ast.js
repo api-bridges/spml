@@ -75,6 +75,6 @@ export function PaginateNode(target, limit) {
   return { type: 'Paginate', target, limit };
 }
 
-export function EscapeHatchNode(rawJs) {
-  return { type: 'EscapeHatch', rawJs };
+export function EscapeHatchNode(rawJs, line) {
+  return { type: 'EscapeHatch', rawJs, line };
 }
