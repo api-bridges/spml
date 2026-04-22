@@ -23,11 +23,18 @@ app.use(morgan('dev'));
 app.use(helmet());
 app.use(rateLimit({ windowMs: 60000, max: 200 }));
 
-// TODO: Define Mongoose models before the route handlers.
-// The following models are referenced: User, Post
-// Example:
-//   const UserSchema = new mongoose.Schema({ /* fields */ }, { timestamps: true });
-//   const User = mongoose.model('User', UserSchema);
+const UserSchema = new mongoose.Schema({
+  name: String,
+  email: { type: String, unique: true },
+  password: String,
+}, { timestamps: true });
+const User = mongoose.model('User', UserSchema);
+
+const PostSchema = new mongoose.Schema({
+  title: String,
+  body: String,
+}, { timestamps: true });
+const Post = mongoose.model('Post', PostSchema);
 
 const authRequired = (req, res, next) => {
   const header = req.headers.authorization;
