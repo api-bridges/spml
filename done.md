@@ -20,3 +20,4 @@
 - Step 16 ✅ Code generation unit tests written in tests/codegen/; snapshot tests for all generators; all tests passing.
 - Step 17 ✅ Full sample API (blog-api.tri) compiled end-to-end; output verified runnable; all 8 routes tested with curl/Postman.
 - Step 18 ✅ Mongoose model auto-generation implemented in src/codegen/models.js; schemas inferred from AST; models emitted in compiled output.
+- Step 19 ✅ Full documentation written: README, KEYWORDS, GETTING_STARTED, LIMITATIONS, and ROADMAP docs created in docs/.
