@@ -1,0 +1,53 @@
+server port 3000
+
+database connect "mongodb://localhost/blog"
+
+middleware cors
+middleware logs
+middleware helmet
+middleware ratelimit max 200 per minute
+
+# Authors
+
+route POST /authors
+  take name, email, bio
+  require name, email
+  validate email is email
+  create author with name, email, bio
+  return author
+
+route GET /authors/:id
+  find author by id
+  if not found return error "Author not found" status 404
+  return author
+
+# Posts — author field references the Author model via ObjectId
+
+route POST /posts
+  auth required
+  take title, body, author
+  require title, body, author
+  create post with title, body, author ref: Author
+  return post
+
+route GET /posts
+  find all post sorted by date
+  populate post.author
+  return posts
+
+route GET /posts/:id
+  find post by id
+  populate post.author
+  if not found return error "Post not found" status 404
+  return post
+
+route PUT /posts/:id
+  auth required
+  take title, body
+  update post with title, body
+  return ok
+
+route DELETE /posts/:id
+  auth required
+  delete post by id
+  return ok

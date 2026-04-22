@@ -45,7 +45,8 @@ function generateRequire(node) {
 }
 
 /**
- * Generate code for a FindNode (CRUD context).
+ * Generate code for a FindNode (CRUD context), optionally chaining a
+ * `.populate('<field>')` call when a PopulateNode immediately follows.
  *
  * - `find all <model>s sorted by date`
  *     → const <model>s = await <Model>.find({}).sort({ date: -1 });
@@ -56,9 +57,10 @@ function generateRequire(node) {
  *
  * @param {{ type: 'Find', target: string, filter: string|null, options: object }} node
  * @param {string} modelName - Resolved model name passed from the route context.
+ * @param {{ type: 'Populate', model: string, field: string }|null} populateNode
  * @returns {string}
  */
-function generateFind(node, modelName) {
+function generateFind(node, modelName, populateNode) {
   const resolvedModel = node.target || modelName || 'item';
   const varName = resolvedModel.toLowerCase();
   const Model = capitalise(resolvedModel);
@@ -76,26 +78,27 @@ function generateFind(node, modelName) {
   }
 
   const opts = node.options || {};
+  const populateChain = populateNode ? `.populate('${populateNode.field}')` : '';
 
   // find all → return a list
   if (filter === 'all' || opts.all) {
     const listVar = `${varName}s`;
     const sortField = opts.sortBy || 'date';
-    return `const ${listVar} = await ${Model}.find({}).sort({ ${sortField}: -1 });`;
+    return `const ${listVar} = await ${Model}.find({}).sort({ ${sortField}: -1 })${populateChain};`;
   }
 
   // find by id
   if (filter === 'id' || filter === 'by id') {
-    return `const ${varName} = await ${Model}.findById(req.params.id);`;
+    return `const ${varName} = await ${Model}.findById(req.params.id)${populateChain};`;
   }
 
   // find where <field> (single field equality)
   if (filter) {
-    return `const ${varName} = await ${Model}.findOne({ ${filter} });`;
+    return `const ${varName} = await ${Model}.findOne({ ${filter} })${populateChain};`;
   }
 
   // fallback — find all
-  return `const ${varName}s = await ${Model}.find({});`;
+  return `const ${varName}s = await ${Model}.find({})${populateChain};`;
 }
 
 /**
@@ -238,7 +241,8 @@ export function generateCrudStatements(statementsArray, modelName) {
 
   const lines = [];
 
-  for (const node of statementsArray) {
+  for (let i = 0; i < statementsArray.length; i++) {
+    const node = statementsArray[i];
     switch (node.type) {
       case 'Take':
         lines.push(generateTake(node));
@@ -248,8 +252,18 @@ export function generateCrudStatements(statementsArray, modelName) {
         lines.push(generateRequire(node));
         break;
 
-      case 'Find':
-        lines.push(generateFind(node, modelName));
+      case 'Find': {
+        // Look ahead: if the immediately following node is a Populate, chain it
+        const next = statementsArray[i + 1];
+        const populateNode = next && next.type === 'Populate' ? next : null;
+        if (populateNode) i++; // consume the Populate node
+        lines.push(generateFind(node, modelName, populateNode));
+        break;
+      }
+
+      case 'Populate':
+        // A Populate node not immediately following a Find — emit standalone populate call
+        lines.push(`// populate ${node.model}.${node.field} (no preceding find)`);
         break;
 
       case 'Paginate':

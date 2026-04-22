@@ -62,4 +62,6 @@ export const KEYWORDS = new Set([
   'Number',
   'Boolean',
   'Date',
+  'populate',
+  'ref',
 ]);

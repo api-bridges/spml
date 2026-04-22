@@ -167,6 +167,67 @@ describe('generateCrudStatements()', () => {
     });
   });
 
+  // ── populate ─────────────────────────────────────────────────────────────────
+
+  describe('Populate node — find → populate → return', () => {
+    it('chains .populate() onto a findById query', () => {
+      const output = generateCrudStatements(
+        [
+          { type: 'Find', target: 'post', filter: 'id', options: {} },
+          { type: 'Populate', model: 'post', field: 'author' },
+          { type: 'Return', value: 'post' },
+        ],
+        'post',
+      );
+      expect(output).toContain(".populate('author')");
+      expect(output).toContain('findById(req.params.id)');
+    });
+
+    it('chains .populate() onto a find-all query', () => {
+      const output = generateCrudStatements(
+        [
+          { type: 'Find', target: 'post', filter: 'all', options: { all: true } },
+          { type: 'Populate', model: 'post', field: 'author' },
+        ],
+        'post',
+      );
+      expect(output).toContain(".populate('author')");
+      expect(output).toContain('Post.find({})');
+    });
+
+    it('chains .populate() onto a findOne query', () => {
+      const output = generateCrudStatements(
+        [
+          { type: 'Find', target: 'post', filter: 'slug', options: {} },
+          { type: 'Populate', model: 'post', field: 'author' },
+        ],
+        'post',
+      );
+      expect(output).toContain(".populate('author')");
+      expect(output).toContain('findOne');
+    });
+
+    it('does not emit populate when no Populate node follows Find', () => {
+      const output = generateCrudStatements(
+        [{ type: 'Find', target: 'post', filter: 'id', options: {} }],
+        'post',
+      );
+      expect(output).not.toContain('.populate(');
+    });
+
+    it('matches find → populate → return snapshot', () => {
+      const output = generateCrudStatements(
+        [
+          { type: 'Find', target: 'post', filter: 'id', options: {} },
+          { type: 'Populate', model: 'post', field: 'author' },
+          { type: 'Return', value: 'post' },
+        ],
+        'post',
+      );
+      expect(output).toMatchSnapshot();
+    });
+  });
+
   // ── combined snapshot ────────────────────────────────────────────────────────
 
   it('matches combined CRUD flow snapshot', () => {

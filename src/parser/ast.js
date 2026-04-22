@@ -79,6 +79,10 @@ export function EscapeHatchNode(rawJs, line) {
   return { type: 'EscapeHatch', rawJs, line };
 }
 
-export function FieldNode(name, fieldType = 'String') {
-  return { type: 'Field', name, fieldType };
+export function FieldNode(name, fieldType = 'String', ref = null) {
+  return { type: 'Field', name, fieldType, ref };
+}
+
+export function PopulateNode(model, field) {
+  return { type: 'Populate', model, field };
 }

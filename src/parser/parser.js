@@ -29,6 +29,7 @@ import {
   PaginateNode,
   EscapeHatchNode,
   FieldNode,
+  PopulateNode,
 } from './ast.js';
 
 // Token types that represent explicit scalar field types
@@ -42,12 +43,12 @@ const FIELD_TYPE_TOKEN_TYPES = new Set([
 // Keywords that begin block-level statements (used to detect where an if-condition ends)
 const BODY_KEYWORDS = new Set([
   'return', 'auth', 'take', 'require', 'validate',
-  'find', 'create', 'update', 'delete', 'hash', 'paginate',
+  'find', 'create', 'update', 'delete', 'hash', 'paginate', 'populate',
 ]);
 
 // Human-readable list of valid statement-level keywords (used in error hints)
 const STATEMENT_KEYWORDS_LIST =
-  'auth, take, require, validate, find, create, update, delete, return, exists, if, hash, paginate';
+  'auth, take, require, validate, find, create, update, delete, return, exists, if, hash, paginate, populate';
 
 // Parse a numeric string, throwing a structured error if the result is NaN.
 function parseNumber(token) {
@@ -236,6 +237,7 @@ class Parser {
         case 'if':       return this.parseIf();
         case 'hash':     return this.parseHash();
         case 'paginate': return this.parsePaginate();
+        case 'populate': return this.parsePopulate();
       }
     }
     // Escape hatch: `js:` block or legacy `escape` identifier
@@ -453,6 +455,16 @@ class Parser {
     return PaginateNode(targetToken.value, parseNumber(limitToken));
   }
 
+  // populate <model>.<field>
+  parsePopulate() {
+    this.expect(TOKEN_TYPES.KEYWORD, 'populate');
+    const modelToken = this.expectIdentifierOrKeyword();
+    this.expect(TOKEN_TYPES.OPERATOR, '.');
+    const fieldToken = this.expectIdentifierOrKeyword();
+    this.consumeNewline();
+    return PopulateNode(modelToken.value, fieldToken.value);
+  }
+
   // js:
   //   <raw js block>
   // or legacy:
@@ -503,13 +515,15 @@ class Parser {
     return fields;
   }
 
-  // Parse a comma-separated list of fields with optional `: TypeKeyword` suffixes.
+  // Parse a comma-separated list of fields with optional `: TypeKeyword` suffixes
+  // and an optional `ref: ModelName` modifier.
   // Returns an array of FieldNode objects.
   parseTypedFieldList() {
     const fields = [];
     const parseSingle = () => {
       const nameToken = this.expectIdentifierOrKeyword();
       let fieldType = 'String';
+      let ref = null;
       if (this.match(TOKEN_TYPES.OPERATOR, ':')) {
         const typeToken = this.peek();
         if (FIELD_TYPE_TOKEN_TYPES.has(typeToken.type)) {
@@ -521,7 +535,13 @@ class Parser {
           );
         }
       }
-      return FieldNode(nameToken.value, fieldType);
+      // Optional `ref: ModelName` modifier
+      if (this.check(TOKEN_TYPES.KEYWORD, 'ref')) {
+        this.advance(); // consume 'ref'
+        this.expect(TOKEN_TYPES.OPERATOR, ':');
+        ref = this.expectIdentifierOrKeyword().value;
+      }
+      return FieldNode(nameToken.value, fieldType, ref);
     };
     fields.push(parseSingle());
     while (this.match(TOKEN_TYPES.OPERATOR, ',')) {
