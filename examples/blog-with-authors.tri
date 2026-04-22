@@ -25,9 +25,9 @@ route GET /authors/:id
 
 route POST /posts
   auth required
-  take title, body, author: String ref: Author
+  take title, body, author
   require title, body, author
-  create post with title, body, author: String ref: Author
+  create post with title, body, author ref: Author
   return post
 
 route GET /posts
