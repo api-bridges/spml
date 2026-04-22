@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "bin": {
+    "trionary": "./src/cli/index.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -23,5 +26,8 @@
     "eslint": "^10.2.1",
     "jest": "^30.3.0",
     "prettier": "^3.8.3"
+  },
+  "dependencies": {
+    "chokidar": "^5.0.0"
   }
 }
