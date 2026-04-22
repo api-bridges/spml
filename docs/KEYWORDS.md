@@ -23,8 +23,36 @@ All reserved keywords in the Trionary language, grouped by category. Keywords ar
 | `GET` | HTTP GET method | `route GET /posts` |
 | `POST` | HTTP POST method | `route POST /register` |
 | `PUT` | HTTP PUT method | `route PUT /posts/:id` |
-| `PATCH` | HTTP PATCH method | `route PATCH /settings` |
+| `PATCH` | HTTP PATCH method | `route PATCH /posts/:id` |
 | `DELETE` | HTTP DELETE method | `route DELETE /posts/:id` |
+
+### PUT vs PATCH — codegen behaviour
+
+Trionary generates different update logic depending on the HTTP method of the route that contains an `update` statement:
+
+| Method | Generated code | Semantics |
+|---|---|---|
+| `PUT` | `Model.updateOne({ _id: req.params.id }, { ...req.body })` | Full document replacement — every field in the Mongoose document is overwritten with the entire request body. |
+| `PATCH` | `const updates = {}; if (req.body.<field> !== undefined) …; Model.findByIdAndUpdate(req.params.id, { $set: updates }, { new: true })` | Selective update — only request-body fields that are explicitly present (not `undefined`) are written to the database. Omitted fields retain their existing values. |
+
+**Example — PATCH route:**
+
+```tri
+route PATCH /posts/:id
+  auth required
+  take title, body
+  update post with title, body
+  return ok
+```
+
+Generated output (excerpt):
+
+```js
+const updates = {};
+if (req.body.title !== undefined) updates.title = req.body.title;
+if (req.body.body !== undefined) updates.body = req.body.body;
+await Post.findByIdAndUpdate(req.params.id, { $set: updates }, { new: true });
+```
 
 ---
 

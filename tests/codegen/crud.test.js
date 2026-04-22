@@ -75,15 +75,77 @@ describe('generateCrudStatements()', () => {
     });
   });
 
-  // ── update ──────────────────────────────────────────────────────────────────
+  // ── update (PUT — full replace) ──────────────────────────────────────────────
 
-  describe('Update node', () => {
+  describe('Update node — PUT (full replace)', () => {
     it('generates updateOne for an update-post node', () => {
       const output = generateCrudStatements(
         [{ type: 'Update', model: 'post', fields: ['title', 'body'] }],
         'post',
       );
       expect(output).toContain('Post.updateOne');
+    });
+  });
+
+  // ── update (PATCH — selective $set) ─────────────────────────────────────────
+
+  describe('Update node — PATCH (selective $set)', () => {
+    it('emits findByIdAndUpdate with $set for a PATCH route', () => {
+      const output = generateCrudStatements(
+        [{ type: 'Update', model: 'post', fields: ['title', 'body'] }],
+        'post',
+        'PATCH',
+      );
+      expect(output).toContain('findByIdAndUpdate');
+      expect(output).toContain('$set: updates');
+      expect(output).toContain('{ new: true }');
+    });
+
+    it('emits a per-field undefined guard for each field', () => {
+      const output = generateCrudStatements(
+        [{ type: 'Update', model: 'post', fields: ['title', 'body'] }],
+        'post',
+        'PATCH',
+      );
+      expect(output).toContain('req.body.title !== undefined');
+      expect(output).toContain('req.body.body !== undefined');
+    });
+
+    it('does NOT emit updateOne for a PATCH route', () => {
+      const output = generateCrudStatements(
+        [{ type: 'Update', model: 'post', fields: ['title', 'body'] }],
+        'post',
+        'PATCH',
+      );
+      expect(output).not.toContain('updateOne');
+    });
+
+    it('handles FieldNode objects (typed fields) for PATCH routes', () => {
+      const output = generateCrudStatements(
+        [
+          {
+            type: 'Update',
+            model: 'post',
+            fields: [
+              { type: 'Field', name: 'title', fieldType: 'String', ref: null },
+              { type: 'Field', name: 'views', fieldType: 'Number', ref: null },
+            ],
+          },
+        ],
+        'post',
+        'PATCH',
+      );
+      expect(output).toContain('req.body.title !== undefined');
+      expect(output).toContain('req.body.views !== undefined');
+    });
+
+    it('matches PATCH update snapshot', () => {
+      const output = generateCrudStatements(
+        [{ type: 'Update', model: 'post', fields: ['title', 'body'] }],
+        'post',
+        'PATCH',
+      );
+      expect(output).toMatchSnapshot();
     });
   });
 
