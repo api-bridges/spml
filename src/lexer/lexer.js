@@ -125,13 +125,16 @@ export function tokenize(source) {
       }
 
       if (!matched) {
-        // Advance past unrecognised character to avoid an infinite loop
+        // Warn about unrecognised characters and advance to avoid an infinite loop
+        process.stderr.write(
+          `[lexer] warning: line ${lineNumber}, col ${col}: unexpected character '${remaining[0]}' — skipped\n`,
+        );
         col += 1;
         remaining = remaining.slice(1);
       }
     }
 
-    // Emit a NEWLINE after each content line
+    // Emit a NEWLINE at the column immediately after the last character on the line
     tokens.push({ type: TOKEN_TYPES.NEWLINE, value: '\n', line: lineNumber, col });
   }
 
