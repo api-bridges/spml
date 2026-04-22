@@ -4,3 +4,4 @@
 
 - Step 1 ✅ Repository and project scaffold created; folder structure, package.json, done.md, and tooling config in place.
 - Step 2 ✅ Token types, reserved keyword set, and regex patterns defined in src/lexer/.
+- Step 3 ✅ Lexer implemented in src/lexer/lexer.js; tokenize() and tokenizeFile() exported; INDENT/DEDENT and position tracking included.
