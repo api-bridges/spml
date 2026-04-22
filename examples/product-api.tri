@@ -1,0 +1,33 @@
+server port 3000
+
+database connect "mongodb://localhost/shop"
+
+middleware cors
+middleware logs
+
+route GET /products
+  paginate product limit 20
+  return products
+
+route POST /products
+  auth required
+  take name, price: Number, sku, inStock: Boolean
+  require name, price, sku
+  create product with name, price: Number, sku, inStock: Boolean
+  return product
+
+route GET /products/:id
+  find product by id
+  if not found return error "Product not found" status 404
+  return product
+
+route PUT /products/:id
+  auth required
+  take name, price: Number, sku, inStock: Boolean
+  update product with name, price: Number, sku, inStock: Boolean
+  return ok
+
+route DELETE /products/:id
+  auth required
+  delete product by id
+  return ok

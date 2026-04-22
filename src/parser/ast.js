@@ -78,3 +78,7 @@ export function PaginateNode(target, limit) {
 export function EscapeHatchNode(rawJs, line) {
   return { type: 'EscapeHatch', rawJs, line };
 }
+
+export function FieldNode(name, fieldType = 'String') {
+  return { type: 'Field', name, fieldType };
+}

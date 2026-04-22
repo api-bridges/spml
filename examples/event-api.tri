@@ -1,0 +1,33 @@
+server port 3000
+
+database connect "mongodb://localhost/events"
+
+middleware cors
+middleware logs
+
+route GET /events
+  paginate event limit 20
+  return events
+
+route POST /events
+  auth required
+  take name, startsAt: Date, endsAt: Date, capacity: Number
+  require name, startsAt, capacity
+  create event with name, startsAt: Date, endsAt: Date, capacity: Number
+  return event
+
+route GET /events/:id
+  find event by id
+  if not found return error "Event not found" status 404
+  return event
+
+route PUT /events/:id
+  auth required
+  take name, startsAt: Date, endsAt: Date, capacity: Number
+  update event with name, startsAt: Date, endsAt: Date, capacity: Number
+  return ok
+
+route DELETE /events/:id
+  auth required
+  delete event by id
+  return ok

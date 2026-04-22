@@ -11,6 +11,14 @@ import { KEYWORDS } from './keywords.js';
 import { TOKEN_PATTERNS } from './patterns.js';
 import { TrinaryError } from '../errors/TrinaryError.js';
 
+// Maps the text of a type keyword to its dedicated token type.
+const FIELD_TYPE_TOKENS = new Map([
+  ['String', TOKEN_TYPES.TYPE_STRING],
+  ['Number', TOKEN_TYPES.TYPE_NUMBER],
+  ['Boolean', TOKEN_TYPES.TYPE_BOOLEAN],
+  ['Date', TOKEN_TYPES.TYPE_DATE],
+]);
+
 /**
  * Tokenise a Trionary source string.
  *
@@ -108,9 +116,9 @@ export function tokenize(source) {
             // Strip surrounding double quotes to expose the inner value
             value = raw.slice(1, -1);
           } else if (type === TOKEN_TYPES.IDENTIFIER) {
-            // Reclassify as KEYWORD when the text is a reserved word
+            // Reclassify as KEYWORD (or a dedicated type token) when the text is a reserved word
             if (KEYWORDS.has(raw)) {
-              tokenType = TOKEN_TYPES.KEYWORD;
+              tokenType = FIELD_TYPE_TOKENS.get(raw) ?? TOKEN_TYPES.KEYWORD;
             }
           } else if (type === TOKEN_TYPES.COMMENT) {
             // Inline comment matched — skip the rest of the line

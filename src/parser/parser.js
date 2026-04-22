@@ -28,7 +28,16 @@ import {
   HashNode,
   PaginateNode,
   EscapeHatchNode,
+  FieldNode,
 } from './ast.js';
+
+// Token types that represent explicit scalar field types
+const FIELD_TYPE_TOKEN_TYPES = new Set([
+  TOKEN_TYPES.TYPE_STRING,
+  TOKEN_TYPES.TYPE_NUMBER,
+  TOKEN_TYPES.TYPE_BOOLEAN,
+  TOKEN_TYPES.TYPE_DATE,
+]);
 
 // Keywords that begin block-level statements (used to detect where an if-condition ends)
 const BODY_KEYWORDS = new Set([
@@ -330,22 +339,22 @@ class Parser {
     return FindNode(modelToken.value, filter, options);
   }
 
-  // create <model> with <field>, <field>, ...
+  // create <model> with <field>[: <Type>], <field>[: <Type>], ...
   parseCreate() {
     this.expect(TOKEN_TYPES.KEYWORD, 'create');
     const modelToken = this.expectIdentifierOrKeyword();
     this.expect(TOKEN_TYPES.KEYWORD, 'with');
-    const fields = this.parseCommaSeparatedIdentifiers();
+    const fields = this.parseTypedFieldList();
     this.consumeNewline();
     return CreateNode(modelToken.value, fields);
   }
 
-  // update <model> with <field>, <field>, ...
+  // update <model> with <field>[: <Type>], <field>[: <Type>], ...
   parseUpdate() {
     this.expect(TOKEN_TYPES.KEYWORD, 'update');
     const modelToken = this.expectIdentifierOrKeyword();
     this.expect(TOKEN_TYPES.KEYWORD, 'with');
-    const fields = this.parseCommaSeparatedIdentifiers();
+    const fields = this.parseTypedFieldList();
     this.consumeNewline();
     return UpdateNode(modelToken.value, fields);
   }
@@ -490,6 +499,33 @@ class Parser {
     const fields = [this.expectIdentifierOrKeyword().value];
     while (this.match(TOKEN_TYPES.OPERATOR, ',')) {
       fields.push(this.expectIdentifierOrKeyword().value);
+    }
+    return fields;
+  }
+
+  // Parse a comma-separated list of fields with optional `: TypeKeyword` suffixes.
+  // Returns an array of FieldNode objects.
+  parseTypedFieldList() {
+    const fields = [];
+    const parseSingle = () => {
+      const nameToken = this.expectIdentifierOrKeyword();
+      let fieldType = 'String';
+      if (this.match(TOKEN_TYPES.OPERATOR, ':')) {
+        const typeToken = this.peek();
+        if (FIELD_TYPE_TOKEN_TYPES.has(typeToken.type)) {
+          fieldType = this.advance().value;
+        } else {
+          throw new TrinaryError(
+            `Expected a field type (String, Number, Boolean, Date) but got ${typeToken.type}(${typeToken.value})`,
+            { line: typeToken.line, col: typeToken.col, source: 'parser' },
+          );
+        }
+      }
+      return FieldNode(nameToken.value, fieldType);
+    };
+    fields.push(parseSingle());
+    while (this.match(TOKEN_TYPES.OPERATOR, ',')) {
+      fields.push(parseSingle());
     }
     return fields;
   }
