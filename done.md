@@ -16,3 +16,4 @@
 - Step 12 ✅ Error messaging system built in src/errors/; TrinaryError class, plain-English messages, and keyword suggestions implemented.
 - Step 13 ✅ CLI implemented in src/cli/index.js; trionary init, trionary build, and trionary dev commands working; chokidar watch mode included.
 - Step 14 ✅ Lexer unit tests written in tests/lexer/lexer.test.js; all tests passing with ≥90% coverage.
+- Step 15 ✅ Parser unit tests written in tests/parser/parser.test.js; AST shapes and error cases verified; all tests passing.
