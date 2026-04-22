@@ -10,3 +10,4 @@
 - Step 6 ✅ Code generators for server, database, middleware, and imports created in src/codegen/.
 - Step 7 ✅ Auth route code generation implemented in src/codegen/auth.js; covers register, login, and /me handlers.
 - Step 8 ✅ CRUD route code generation implemented in src/codegen/crud.js; covers find, create, update, delete, paginate, take, require, and conditional returns.
+- Step 9 ✅ Validation code generation implemented in src/codegen/validate.js; email and min-length rules supported; extensible via VALIDATORS dispatch map.

@@ -5,6 +5,7 @@
 // All generators return strings; no file I/O is performed here.
 
 import { addImport } from './imports.js';
+import { generateValidate } from './validate.js';
 
 /**
  * Register the npm packages required by CRUD route generation.
@@ -261,6 +262,10 @@ export function generateCrudStatements(statementsArray, modelName) {
 
       case 'If':
         lines.push(generateIf(node, modelName));
+        break;
+
+      case 'Validate':
+        lines.push(generateValidate(node));
         break;
 
       default:
