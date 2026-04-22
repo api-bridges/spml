@@ -5,6 +5,9 @@
 
 import { tokenizeFile } from '../lexer/lexer.js';
 import { TOKEN_TYPES } from '../lexer/tokens.js';
+import { TrinaryError } from '../errors/TrinaryError.js';
+import { suggest } from '../errors/suggestions.js';
+import { MESSAGES, interpolate } from '../errors/messages.js';
 import {
   ProgramNode,
   ServerDeclarationNode,
@@ -33,11 +36,17 @@ const BODY_KEYWORDS = new Set([
   'find', 'create', 'update', 'delete', 'hash', 'paginate',
 ]);
 
+// Human-readable list of valid statement-level keywords (used in error hints)
+const STATEMENT_KEYWORDS_LIST =
+  'auth, take, require, validate, find, create, update, delete, return, exists, if, hash, paginate';
+
 // Parse a numeric string, throwing a structured error if the result is NaN.
 function parseNumber(token) {
   const n = Number(token.value);
   if (Number.isNaN(n)) {
-    throw { message: `Invalid number: '${token.value}'`, line: token.line, col: token.col, source: 'parser' };
+    throw new TrinaryError(interpolate(MESSAGES.INVALID_NUMBER, { value: token.value }), {
+      line: token.line, col: token.col, source: 'parser',
+    });
   }
   return n;
 }
@@ -75,7 +84,9 @@ class Parser {
     if (t.type !== type || (value !== null && t.value !== value)) {
       const got = `${t.type}(${t.value})`;
       const expected = value !== null ? `${type}(${value})` : type;
-      throw { message: `Expected ${expected} but got ${got}`, line: t.line, col: t.col, source: 'parser' };
+      throw new TrinaryError(interpolate(MESSAGES.EXPECTED_TOKEN, { expected, got }), {
+        line: t.line, col: t.col, source: 'parser',
+      });
     }
     return this.advance();
   }
@@ -86,7 +97,9 @@ class Parser {
     if (t.type === TOKEN_TYPES.IDENTIFIER || t.type === TOKEN_TYPES.KEYWORD) {
       return this.advance();
     }
-    throw { message: `Expected identifier but got ${t.type}(${t.value})`, line: t.line, col: t.col, source: 'parser' };
+    throw new TrinaryError(interpolate(MESSAGES.EXPECTED_IDENTIFIER, { got: `${t.type}(${t.value})` }), {
+      line: t.line, col: t.col, source: 'parser',
+    });
   }
 
   isLineEnd() {
@@ -126,7 +139,10 @@ class Parser {
         case 'route':      return this.parseRoute();
       }
     }
-    throw { message: `Unexpected top-level token: ${t.type}(${t.value})`, line: t.line, col: t.col, source: 'parser' };
+    throw new TrinaryError(interpolate(MESSAGES.UNEXPECTED_TOP_LEVEL, { token: `${t.type}(${t.value})` }), {
+      line: t.line, col: t.col, source: 'parser',
+      hint: 'Valid top-level keywords are: server, database, middleware, route.',
+    });
   }
 
   // server port <number>
@@ -223,7 +239,13 @@ class Parser {
         }
       }
     }
-    throw { message: `Unexpected statement token: ${t.type}(${t.value})`, line: t.line, col: t.col, source: 'parser' };
+    const suggestion = suggest(t.value);
+    const msgTemplate = suggestion ? MESSAGES.UNEXPECTED_TOKEN : MESSAGES.UNEXPECTED_TOKEN_NO_HINT;
+    const msg = interpolate(msgTemplate, { token: `${t.type}(${t.value})`, suggestion: suggestion ?? '' });
+    throw new TrinaryError(msg, {
+      line: t.line, col: t.col, source: 'parser',
+      hint: `Valid statement keywords are: ${STATEMENT_KEYWORDS_LIST}.`,
+    });
   }
 
   // ── Individual statement parsers ───────────────────────────────────────────

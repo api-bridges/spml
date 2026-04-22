@@ -4,6 +4,9 @@
 // New rules can be added to the VALIDATORS dispatch map without touching
 // existing logic.
 
+import { TrinaryError } from '../errors/TrinaryError.js';
+import { MESSAGES, interpolate } from '../errors/messages.js';
+
 /**
  * Escape single quotes so the string is safe inside a single-quoted JS string
  * literal in generated code.
@@ -90,9 +93,9 @@ export function generateValidate(node) {
   const handler = VALIDATORS[key];
 
   if (!handler) {
-    throw new Error(
-      `[Trionary] Unknown validation rule: "${node.rule}". ` +
-        `Supported rules: ${Object.keys(VALIDATORS).join(', ')}.`
+    throw new TrinaryError(
+      interpolate(MESSAGES.UNKNOWN_VALIDATION_RULE, { rule: node.rule, supported: Object.keys(VALIDATORS).join(', ') }),
+      { source: 'codegen' }
     );
   }
 

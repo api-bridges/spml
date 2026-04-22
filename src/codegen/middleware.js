@@ -3,6 +3,8 @@
 // Returns a string of Node.js code; no file I/O is performed here.
 
 import { addImport } from './imports.js';
+import { TrinaryError } from '../errors/TrinaryError.js';
+import { MESSAGES, interpolate } from '../errors/messages.js';
 
 /**
  * Middleware keyword → { pkg, call } mapping.
@@ -37,7 +39,10 @@ export function generateMiddleware(node) {
 
   const entry = MIDDLEWARE_MAP[name];
   if (!entry) {
-    throw new Error(`Unknown middleware: "${name}"`);
+    throw new TrinaryError(interpolate(MESSAGES.UNKNOWN_MIDDLEWARE, { name }), {
+      source: 'codegen',
+      hint: 'Supported middleware keywords are: cors, logs, helmet, ratelimit, compress.',
+    });
   }
 
   let localId;
