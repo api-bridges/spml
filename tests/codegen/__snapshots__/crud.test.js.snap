@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`generateCrudStatements() Paginate node matches snapshot 1`] = `
+"const page = parseInt(req.query.page, 10) || 1;
+const posts = await Post.find({}).skip((page - 1) * 20).limit(20);"
+`;
+
+exports[`generateCrudStatements() matches combined CRUD flow snapshot 1`] = `
+"const { title, body } = req.body;
+if (!title) return res.status(400).json({ error: 'Missing required fields: title' });
+const post = await Post.create({ ...req.body });
+return res.json({ post });"
+`;
