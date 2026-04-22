@@ -63,7 +63,18 @@ function generateFind(node, modelName) {
   const varName = resolvedModel.toLowerCase();
   const Model = capitalise(resolvedModel);
 
-  const filter = node.filter ? String(node.filter).trim().toLowerCase() : '';
+  const rawFilter = node.filter;
+  let filter = '';
+  if (rawFilter && typeof rawFilter === 'object') {
+    if (rawFilter.by) {
+      filter = `by ${rawFilter.by}`;
+    } else if (rawFilter.field) {
+      filter = rawFilter.field;
+    }
+  } else {
+    filter = rawFilter ? String(rawFilter).trim().toLowerCase() : '';
+  }
+
   const opts = node.options || {};
 
   // find all → return a list
@@ -305,20 +316,25 @@ function capitalise(str) {
  * @returns {string}
  */
 function extractMessage(body, defaultMessage) {
-  if (typeof body === 'string') return body;
-  if (body && typeof body.value === 'string') return body.value;
+  const node = Array.isArray(body) ? body[0] : body;
+  if (typeof node === 'string') return node;
+  if (node && node.value && typeof node.value === 'object' && typeof node.value.error === 'string') {
+    return node.value.error;
+  }
+  if (node && typeof node.value === 'string') return node.value;
   return defaultMessage;
 }
 
 /**
- * Extract an HTTP status code from a body value.
+ * Extract an HTTP status code from a body value (may be an array of AST nodes).
  *
- * @param {string|object} body
+ * @param {string|object|Array} body
  * @param {number} defaultStatus
  * @returns {number}
  */
 function extractStatus(body, defaultStatus) {
-  if (body && typeof body.statusCode === 'number') return body.statusCode;
+  const node = Array.isArray(body) ? body[0] : body;
+  if (node && typeof node.statusCode === 'number') return node.statusCode;
   return defaultStatus;
 }
 

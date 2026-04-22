@@ -5,6 +5,35 @@
 
 import { addImport } from './imports.js';
 import { generateEscape } from './escape.js';
+import { generateValidate } from './validate.js';
+
+/**
+ * Generate code for a TakeNode (auth context).
+ * Trionary: `take name, email, password`
+ * Output:   const { name, email, password } = req.body;
+ *
+ * @param {{ type: 'Take', fields: string[] }} node
+ * @returns {string}
+ */
+function generateTake(node) {
+  const fields = Array.isArray(node.fields) ? node.fields.join(', ') : node.fields;
+  return `const { ${fields} } = req.body;`;
+}
+
+/**
+ * Generate code for a RequireNode (auth context).
+ * Trionary: `require name, email, password`
+ * Output:   if (!name || !email || !password) return res.status(400).json({ error: 'Missing required fields: name, email, password' });
+ *
+ * @param {{ type: 'Require', fields: string[] }} node
+ * @returns {string}
+ */
+function generateRequire(node) {
+  const fields = Array.isArray(node.fields) ? node.fields : [node.fields];
+  const checks = fields.map((f) => `!${f}`).join(' || ');
+  const fieldList = fields.join(', ');
+  return `if (${checks}) return res.status(400).json({ error: 'Missing required fields: ${fieldList}' });`;
+}
 
 /**
  * Register the npm packages required by auth route generation.
@@ -67,6 +96,12 @@ function generateIf(node) {
     return `if (exists) return res.status(409).json({ error: '${escapeQuotes(message)}' });`;
   }
 
+  if (condition === 'not user' || condition === '!user') {
+    const message = extractMessage(body, 'User not found');
+    const status = extractStatus(body, 404);
+    return `if (!user) return res.status(${status}).json({ error: '${escapeQuotes(message)}' });`;
+  }
+
   if (condition === '!valid' || condition === 'not valid') {
     const message = extractMessage(body, 'Invalid credentials');
     return `if (!valid) return res.status(401).json({ error: '${escapeQuotes(message)}' });`;
@@ -88,8 +123,7 @@ function generateIf(node) {
 function generateCreate(node) {
   const varName = node.model.toLowerCase();
   const Model = capitalise(node.model);
-  const fields = Array.isArray(node.fields) ? node.fields.join(', ') : node.fields;
-  return `const ${varName} = await ${Model}.create({ ${fields} });`;
+  return `const ${varName} = await ${Model}.create({ ...req.body });`;
 }
 
 /**
@@ -168,6 +202,14 @@ export function generateAuthStatements(statementsArray) {
 
   for (const node of statementsArray) {
     switch (node.type) {
+      case 'Take':
+        lines.push(generateTake(node));
+        break;
+
+      case 'Require':
+        lines.push(generateRequire(node));
+        break;
+
       case 'Hash':
         lines.push(generateHash(node));
         break;
@@ -193,9 +235,10 @@ export function generateAuthStatements(statementsArray) {
         break;
 
       case 'Validate':
-        // `validate password matches` — password comparison check.
         if (node.rule === 'matches') {
           lines.push(generatePasswordMatches());
+        } else {
+          lines.push(generateValidate(node));
         }
         break;
 
@@ -235,9 +278,26 @@ function capitalise(str) {
  * @returns {string}
  */
 function extractMessage(body, defaultMessage) {
-  if (typeof body === 'string') return body;
-  if (body && typeof body.value === 'string') return body.value;
+  const node = Array.isArray(body) ? body[0] : body;
+  if (typeof node === 'string') return node;
+  if (node && node.value && typeof node.value === 'object' && typeof node.value.error === 'string') {
+    return node.value.error;
+  }
+  if (node && typeof node.value === 'string') return node.value;
   return defaultMessage;
+}
+
+/**
+ * Extract an HTTP status code from a body value (may be an array of AST nodes).
+ *
+ * @param {string|object|Array} body
+ * @param {number} defaultStatus
+ * @returns {number}
+ */
+function extractStatus(body, defaultStatus) {
+  const node = Array.isArray(body) ? body[0] : body;
+  if (node && typeof node.statusCode === 'number') return node.statusCode;
+  return defaultStatus;
 }
 
 /**

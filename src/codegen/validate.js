@@ -44,7 +44,7 @@ const VALIDATORS = {
   email: (node) => {
     const field = node.field;
     return [
-      `const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;`,
+      `const emailRegex = /^[^\\s@]+@[^\\s@.]+(?:\\.[^\\s@.]+)+$/;`,
       `if (!emailRegex.test(${field})) return res.status(400).json({ error: 'Invalid email address' });`,
     ].join('\n');
   },
