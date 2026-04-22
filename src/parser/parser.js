@@ -33,6 +33,15 @@ const BODY_KEYWORDS = new Set([
   'find', 'create', 'update', 'delete', 'hash', 'paginate',
 ]);
 
+// Parse a numeric string, throwing a structured error if the result is NaN.
+function parseNumber(token) {
+  const n = Number(token.value);
+  if (Number.isNaN(n)) {
+    throw { message: `Invalid number: '${token.value}'`, line: token.line, col: token.col, source: 'parser' };
+  }
+  return n;
+}
+
 class Parser {
   constructor(tokens) {
     this.tokens = tokens;
@@ -126,7 +135,7 @@ class Parser {
     this.expect(TOKEN_TYPES.KEYWORD, 'port');
     const portToken = this.expect(TOKEN_TYPES.NUMBER);
     this.consumeNewline();
-    return ServerDeclarationNode(Number(portToken.value));
+    return ServerDeclarationNode(parseNumber(portToken));
   }
 
   // database connect "<uri>"
@@ -145,7 +154,7 @@ class Parser {
     const options = {};
     if (nameToken.value === 'ratelimit' && !this.isLineEnd()) {
       if (this.match(TOKEN_TYPES.KEYWORD, 'max')) {
-        options.max = Number(this.expect(TOKEN_TYPES.NUMBER).value);
+        options.max = parseNumber(this.expect(TOKEN_TYPES.NUMBER));
         if (this.match(TOKEN_TYPES.KEYWORD, 'per')) {
           this.expect(TOKEN_TYPES.KEYWORD, 'minute');
         }
@@ -254,7 +263,7 @@ class Parser {
     if (!this.isLineEnd()) {
       const t = this.peek();
       if (t.type === TOKEN_TYPES.NUMBER) {
-        value = Number(this.advance().value);
+        value = parseNumber(this.advance());
       } else if (t.type === TOKEN_TYPES.STRING) {
         value = this.advance().value;
       } else if (t.type === TOKEN_TYPES.IDENTIFIER || t.type === TOKEN_TYPES.KEYWORD) {
@@ -341,7 +350,7 @@ class Parser {
       }
     }
     if (this.match(TOKEN_TYPES.KEYWORD, 'status')) {
-      statusCode = Number(this.expect(TOKEN_TYPES.NUMBER).value);
+      statusCode = parseNumber(this.expect(TOKEN_TYPES.NUMBER));
     }
     this.consumeNewline();
     return ReturnNode(value, statusCode);
@@ -393,7 +402,7 @@ class Parser {
     this.expect(TOKEN_TYPES.KEYWORD, 'limit');
     const limitToken = this.expect(TOKEN_TYPES.NUMBER);
     this.consumeNewline();
-    return PaginateNode(targetToken.value, Number(limitToken.value));
+    return PaginateNode(targetToken.value, parseNumber(limitToken));
   }
 
   // escape
@@ -413,13 +422,14 @@ class Parser {
         }
       }
       if (this.check(TOKEN_TYPES.DEDENT)) this.advance();
+      return EscapeHatchNode(parts.join('').trim());
     } else {
       while (!this.isLineEnd()) {
         parts.push(this.advance().value);
       }
       this.consumeNewline();
+      return EscapeHatchNode(parts.join(' ').trim());
     }
-    return EscapeHatchNode(parts.join(' ').trim());
   }
 
   // ── Helpers ────────────────────────────────────────────────────────────────
