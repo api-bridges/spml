@@ -1,5 +1,8 @@
 # Trionary Backend
 
+[![npm version](https://img.shields.io/npm/v/trionary.svg)](https://www.npmjs.com/package/trionary)
+[![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
+
 A plain-English backend language that compiles to production-ready Node.js.
 
 ---
@@ -141,3 +144,10 @@ The indented block is emitted verbatim into the compiled output. A warning comme
 - [Getting Started Guide →](docs/GETTING_STARTED.md)
 - [Limitations →](docs/LIMITATIONS.md)
 - [Roadmap →](docs/ROADMAP.md)
+
+---
+
+## Demo API
+
+A working URL-shortener API written entirely in Trionary is included in [`examples/demo-api/`](examples/demo-api/).
+It demonstrates user auth, CRUD operations, pagination, and rate-limiting — all in under 60 lines of plain-English source.
