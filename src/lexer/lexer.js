@@ -9,6 +9,7 @@ import { readFile } from 'fs/promises';
 import { TOKEN_TYPES } from './tokens.js';
 import { KEYWORDS } from './keywords.js';
 import { TOKEN_PATTERNS } from './patterns.js';
+import { TrinaryError } from '../errors/TrinaryError.js';
 
 /**
  * Tokenise a Trionary source string.
@@ -125,12 +126,10 @@ export function tokenize(source) {
       }
 
       if (!matched) {
-        // Warn about unrecognised characters and advance to avoid an infinite loop
-        process.stderr.write(
-          `[lexer] warning: line ${lineNumber}, col ${col}: unexpected character '${remaining[0]}' — skipped\n`,
+        throw new TrinaryError(
+          `Unexpected character '${remaining[0]}' at line ${lineNumber}, col ${col}.`,
+          { line: lineNumber, col, source: 'lexer' },
         );
-        col += 1;
-        remaining = remaining.slice(1);
       }
     }
 
