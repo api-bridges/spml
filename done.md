@@ -7,3 +7,4 @@
 - Step 3 ✅ Lexer implemented in src/lexer/lexer.js; tokenize() and tokenizeFile() exported; INDENT/DEDENT and position tracking included.
 - Step 4 ✅ All 19 AST node factory functions defined in src/parser/ast.js.
 - Step 5 ✅ Recursive-descent parser implemented in src/parser/parser.js; parse() and parseFile() exported; structured errors thrown on bad syntax.
+- Step 6 ✅ Code generators for server, database, middleware, and imports created in src/codegen/.
