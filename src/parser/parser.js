@@ -375,6 +375,17 @@ class Parser {
         value = this.advance().value;
       } else {
         value = this.expectIdentifierOrKeyword().value;
+        // Handle the two-word phrase "current user"
+        if (value === 'current' && !this.isLineEnd()) {
+          const nxt = this.peek();
+          if (
+            (nxt.type === TOKEN_TYPES.IDENTIFIER || nxt.type === TOKEN_TYPES.KEYWORD) &&
+            nxt.value === 'user'
+          ) {
+            this.advance();
+            value = 'current user';
+          }
+        }
       }
     }
     if (this.match(TOKEN_TYPES.KEYWORD, 'status')) {
