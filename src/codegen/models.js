@@ -45,14 +45,19 @@ function inferFieldType(fieldName) {
 /**
  * Resolve the Mongoose type expression for a field.
  *
+ * If the field has an explicit `ref` property, emit an ObjectId reference.
  * If an explicit Trionary type keyword is provided (e.g. 'Number'), it is
  * mapped directly.  Otherwise the field name is used for inference.
  *
  * @param {string} fieldName
  * @param {string} fieldType  Trionary type keyword (e.g. 'Number') or 'String' as default
+ * @param {string|null} ref   Referenced model name (e.g. 'User'), or null
  * @returns {string}
  */
-function resolveFieldType(fieldName, fieldType) {
+function resolveFieldType(fieldName, fieldType, ref) {
+  if (ref) {
+    return `{ type: mongoose.Schema.Types.ObjectId, ref: '${ref}' }`;
+  }
   if (fieldType && EXPLICIT_TYPE_MAP.has(fieldType)) {
     // For String, still apply name-based inference so that email/id conventions hold.
     if (fieldType === 'String') return inferFieldType(fieldName);
@@ -102,9 +107,9 @@ function collectModelFields(ast) {
           if (Array.isArray(stmt.fields)) {
             for (const f of stmt.fields) {
               if (f && typeof f === 'object' && f.type === 'Field') {
-                routeFields.push({ name: f.name.trim(), fieldType: f.fieldType });
+                routeFields.push({ name: f.name.trim(), fieldType: f.fieldType, ref: f.ref ?? null });
               } else if (typeof f === 'string') {
-                routeFields.push({ name: f.trim(), fieldType: null });
+                routeFields.push({ name: f.trim(), fieldType: null, ref: null });
               }
             }
           }
@@ -123,10 +128,10 @@ function collectModelFields(ast) {
           // Collect body fields; associate with whatever model this route uses
           if (Array.isArray(stmt.fields)) {
             for (const f of stmt.fields) {
-              routeFields.push({ name: (typeof f === 'string' ? f : f.name).trim(), fieldType: null });
+              routeFields.push({ name: (typeof f === 'string' ? f : f.name).trim(), fieldType: null, ref: null });
             }
           } else if (typeof stmt.fields === 'string') {
-            routeFields.push({ name: stmt.fields.trim(), fieldType: null });
+            routeFields.push({ name: stmt.fields.trim(), fieldType: null, ref: null });
           }
           break;
 
@@ -141,15 +146,15 @@ function collectModelFields(ast) {
         modelFields.set(modelName, { types: new Map(), explicit: new Set() });
       }
       const { types: fieldMap, explicit: explicitSet } = modelFields.get(modelName);
-      for (const { name, fieldType } of routeFields) {
-        const isExplicit = fieldType !== null;
+      for (const { name, fieldType, ref } of routeFields) {
+        const isExplicit = fieldType !== null || ref !== null;
         if (!fieldMap.has(name)) {
           // First time we see this field: record it with its type (inferred or explicit).
-          fieldMap.set(name, resolveFieldType(name, fieldType ?? 'String'));
+          fieldMap.set(name, resolveFieldType(name, fieldType ?? 'String', ref));
           if (isExplicit) explicitSet.add(name);
         } else if (isExplicit && !explicitSet.has(name)) {
           // Field was previously inferred; an explicit declaration overrides it.
-          fieldMap.set(name, resolveFieldType(name, fieldType));
+          fieldMap.set(name, resolveFieldType(name, fieldType, ref));
           explicitSet.add(name);
         }
         // If the field already has an explicit type, subsequent declarations are ignored.

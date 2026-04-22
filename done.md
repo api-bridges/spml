@@ -23,3 +23,4 @@
 - Step 19 ✅ Full documentation written: README, KEYWORDS, GETTING_STARTED, LIMITATIONS, and ROADMAP docs created in docs/.
 - Step 20 ✅ trionary@0.1.0 published to npm; live demo API deployed; GitHub Release v0.1.0 created; project shipped.
 - Step 21 ✅ Explicit field type declarations (String, Number, Boolean, Date) supported; Mongoose schemas now emit correct types.
+- Step 22 ✅ populate keyword and ObjectId ref fields implemented; Mongoose query chains emit .populate() calls correctly.
