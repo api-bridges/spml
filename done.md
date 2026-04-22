@@ -3,3 +3,4 @@
 <!-- Each step appends one line here when it completes its task. -->
 
 - Step 1 ✅ Repository and project scaffold created; folder structure, package.json, done.md, and tooling config in place.
+- Step 2 ✅ Token types, reserved keyword set, and regex patterns defined in src/lexer/.
