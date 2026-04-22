@@ -14,3 +14,4 @@
 - Step 10 ✅ JWT authRequired middleware generation implemented in src/codegen/authMiddleware.js; auto-injected on routes with auth required.
 - Step 11 ✅ Inline Node.js escape hatch implemented; js: syntax parsed to EscapeHatchNode; raw JS emitted verbatim with warning comment.
 - Step 12 ✅ Error messaging system built in src/errors/; TrinaryError class, plain-English messages, and keyword suggestions implemented.
+- Step 13 ✅ CLI implemented in src/cli/index.js; trionary init, trionary build, and trionary dev commands working; chokidar watch mode included.
