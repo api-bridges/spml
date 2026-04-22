@@ -22,54 +22,11 @@ import { generateAuthStatements } from '../codegen/auth.js';
 import { generateAuthMiddleware, generateRouteWithAuth } from '../codegen/authMiddleware.js';
 import { generateCrudStatements } from '../codegen/crud.js';
 import { generateImports, resetImports, addImport } from '../codegen/imports.js';
+import { generateModels } from '../codegen/models.js';
 
 // ---------------------------------------------------------------------------
 // Compiler — tokenize → parse → codegen
 // ---------------------------------------------------------------------------
-
-/**
- * Capitalise the first letter of a string.
- *
- * @param {string} str
- * @returns {string}
- */
-function capitaliseFirst(str) {
-  if (!str) return str;
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-/**
- * Walk the AST and collect all unique model names referenced in Create, Find,
- * Update, Delete, Paginate, and ExistsCheck nodes.
- *
- * @param {object} ast - ProgramNode
- * @returns {Set<string>} Lower-case model names.
- */
-function collectModelNames(ast) {
-  const names = new Set();
-  for (const node of ast.body) {
-    if (node.type !== 'Route') continue;
-    for (const stmt of node.body) {
-      switch (stmt.type) {
-        case 'Create':
-        case 'Update':
-        case 'Delete':
-          if (stmt.model) names.add(stmt.model.toLowerCase());
-          break;
-        case 'Find':
-        case 'Paginate':
-          if (stmt.target) names.add(stmt.target.toLowerCase());
-          break;
-        case 'ExistsCheck':
-          if (stmt.model) names.add(stmt.model.toLowerCase());
-          break;
-        default:
-          break;
-      }
-    }
-  }
-  return names;
-}
 
 /**
  * Determine whether a route body contains auth-specific nodes (Hash, ExistsCheck).
@@ -197,19 +154,10 @@ export function compile(source) {
   if (dbSection.length) sections.push(dbSection.join('\n'));
   if (middlewareSection.length) sections.push(middlewareSection.join('\n'));
 
-  // Emit a placeholder notice when Mongoose models are referenced but not yet
-  // generated. Model auto-generation is added in Step 18 (models.js).
-  const modelNames = collectModelNames(ast);
-  if (modelNames.size > 0) {
-    const modelList = [...modelNames].map((m) => capitaliseFirst(m)).join(', ');
-    sections.push(
-      `// TODO: Define Mongoose models before the route handlers.\n` +
-      `// The following models are referenced: ${modelList}\n` +
-      `// Example:\n` +
-      `//   const ${[...modelNames][0] ? capitaliseFirst([...modelNames][0]) : 'Model'}Schema = new mongoose.Schema({ /* fields */ }, { timestamps: true });\n` +
-      `//   const ${[...modelNames][0] ? capitaliseFirst([...modelNames][0]) : 'Model'} = mongoose.model('${[...modelNames][0] ? capitaliseFirst([...modelNames][0]) : 'Model'}', ${[...modelNames][0] ? capitaliseFirst([...modelNames][0]) : 'Model'}Schema);`,
-    );
-  }
+  // Emit Mongoose model definitions (inferred from the AST) between the
+  // database connection and the route handlers.
+  const modelsBlock = generateModels(ast);
+  if (modelsBlock) sections.push(modelsBlock);
 
   if (needsAuthMiddleware) sections.push(generateAuthMiddleware());
 
