@@ -12,3 +12,4 @@
 - Step 8 ✅ CRUD route code generation implemented in src/codegen/crud.js; covers find, create, update, delete, paginate, take, require, and conditional returns.
 - Step 9 ✅ Validation code generation implemented in src/codegen/validate.js; email and min-length rules supported; extensible via VALIDATORS dispatch map.
 - Step 10 ✅ JWT authRequired middleware generation implemented in src/codegen/authMiddleware.js; auto-injected on routes with auth required.
+- Step 11 ✅ Inline Node.js escape hatch implemented; js: syntax parsed to EscapeHatchNode; raw JS emitted verbatim with warning comment.

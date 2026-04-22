@@ -4,6 +4,7 @@
 // All generators return strings; no file I/O is performed here.
 
 import { addImport } from './imports.js';
+import { generateEscape } from './escape.js';
 
 /**
  * Register the npm packages required by auth route generation.
@@ -196,6 +197,10 @@ export function generateAuthStatements(statementsArray) {
         if (node.rule === 'matches') {
           lines.push(generatePasswordMatches());
         }
+        break;
+
+      case 'EscapeHatch':
+        lines.push(generateEscape(node));
         break;
 
       default:

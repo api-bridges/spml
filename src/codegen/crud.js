@@ -6,6 +6,7 @@
 
 import { addImport } from './imports.js';
 import { generateValidate } from './validate.js';
+import { generateEscape } from './escape.js';
 
 /**
  * Register the npm packages required by CRUD route generation.
@@ -266,6 +267,10 @@ export function generateCrudStatements(statementsArray, modelName) {
 
       case 'Validate':
         lines.push(generateValidate(node));
+        break;
+
+      case 'EscapeHatch':
+        lines.push(generateEscape(node));
         break;
 
       default:
