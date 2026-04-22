@@ -1,0 +1,65 @@
+server port 3000
+
+database connect "mongodb://localhost/shortener"
+
+middleware cors
+middleware logs
+middleware helmet
+middleware ratelimit max 100 per minute
+
+route POST /register
+  take name, email, password
+  require name, email, password
+  validate email is email
+  validate password is minlength 8
+  exists user where email
+  if exists return error "Email already in use" status 409
+  hash password
+  create user with name, email, password
+  return token
+
+route POST /login
+  take email, password
+  require email, password
+  find user where email
+  if not user return error "User not found" status 404
+  validate password is matches
+  if not valid return error "Invalid credentials" status 401
+  return token
+
+route GET /me
+  auth required
+  return current user
+
+route POST /links
+  auth required
+  take url, slug
+  require url
+  create link with url, slug
+  return link
+
+route GET /links
+  auth required
+  paginate link limit 20
+  return links
+
+route GET /links/:id
+  auth required
+  find link by id
+  if not found return error "Link not found" status 404
+  return link
+
+route PUT /links/:id
+  auth required
+  take url, slug
+  find link by id
+  if not found return error "Link not found" status 404
+  update link with url, slug
+  return ok
+
+route DELETE /links/:id
+  auth required
+  find link by id
+  if not found return error "Link not found" status 404
+  delete link by id
+  return ok

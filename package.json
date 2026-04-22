@@ -1,11 +1,15 @@
 {
   "name": "trionary",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "version": "0.1.0",
+  "description": "A plain-English backend language that compiles to Node.js",
+  "main": "src/cli/index.js",
   "bin": {
     "trionary": "./src/cli/index.js"
   },
+  "files": [
+    "src/",
+    "README.md"
+  ],
   "scripts": {
     "test": "node --experimental-vm-modules node_modules/.bin/jest"
   },
@@ -13,7 +17,7 @@
     "type": "git",
     "url": "git+https://github.com/api-bridges/spml.git"
   },
-  "keywords": [],
+  "keywords": ["compiler", "backend", "nodejs", "express", "plain-english", "dsl"],
   "author": "",
   "license": "ISC",
   "type": "module",
