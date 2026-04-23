@@ -30,3 +30,4 @@
 - Step 26 ✅ Custom middleware keyword implemented; npm package names declared in .tri are emitted as app.use() and added to generated package.json.
 - Step 27 ✅ Multi-database codegen implemented; database type postgres emits Prisma client calls and schema.prisma.
 - Step 28 ✅ VS Code syntax highlighting extension created; TextMate grammar covers all Trionary keywords; .vsix packaged.
+- Step 29 ✅ LSP server implemented; autocomplete, inline diagnostics, and hover documentation work in VS Code.
