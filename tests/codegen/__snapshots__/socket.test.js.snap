@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`generateSocketHandler() matches snapshot 1`] = `
+"_wss.on('connection', (ws) => {
+  ws.on('message', (message) => {
+    _wss.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(message.toString());
+      }
+    });
+  });
+});"
+`;

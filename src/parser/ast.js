@@ -102,3 +102,11 @@ export function ImportNode(path) {
 export function StreamNode() {
   return { type: 'Stream' };
 }
+
+export function SocketNode(path, event, body) {
+  return { type: 'Socket', path, event, body };
+}
+
+export function BroadcastNode(data) {
+  return { type: 'Broadcast', data };
+}
