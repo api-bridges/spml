@@ -254,6 +254,43 @@ node app.js
 
 ---
 
+## Testing your API
+
+Trionary has a built-in test DSL that compiles to Jest + supertest. Write `test` blocks directly in your `.tri` file (or in a companion `.tri.test` file) and run them with `trionary test`.
+
+### Writing test blocks
+
+```tri
+test "POST /register creates a user"
+  send POST /register with name "Alice", email "alice@example.com", password "secret"
+  expect status 200
+  expect body.token exists
+
+test "GET /posts returns a list"
+  send GET /posts
+  expect status 200
+```
+
+**Supported assertions:**
+
+| Assertion | Compiled Jest assertion |
+|---|---|
+| `expect status 200` | `expect(res.status).toBe(200)` |
+| `expect body.token exists` | `expect(res.body.token).toBeDefined()` |
+| `expect body.message "ok"` | `expect(res.body.message).toBe('ok')` |
+
+### Running tests
+
+```bash
+trionary test app.tri
+# ✅ Test file written to app.test.js
+# (Jest runs the compiled test file)
+```
+
+Trionary compiles the `test` blocks to a Jest file (`app.test.js`) alongside your source, then invokes Jest automatically.
+
+---
+
 ## Next steps
 
 - Browse the full [Keyword Reference](KEYWORDS.md)

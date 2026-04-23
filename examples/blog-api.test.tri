@@ -1,0 +1,40 @@
+# blog-api.test.tri
+# Integration test suite for blog-api.tri.
+# Run with: trionary test blog-api.test.tri
+
+test "POST /register creates a new user"
+  send POST /register with name "Alice", email "alice@example.com", password "secret123"
+  expect status 200
+  expect body.token exists
+
+test "POST /login returns a token"
+  send POST /login with email "alice@example.com", password "secret123"
+  expect status 200
+  expect body.token exists
+
+test "GET /me returns current user"
+  send GET /me
+  expect status 200
+  expect body.user exists
+
+test "GET /posts returns paginated list"
+  send GET /posts
+  expect status 200
+
+test "POST /posts creates a post"
+  send POST /posts with title "Hello World", body "My first post"
+  expect status 200
+  expect body.post exists
+
+test "GET /posts/:id returns a single post"
+  send GET /posts/1
+  expect status 200
+  expect body.post exists
+
+test "PUT /posts/:id updates a post"
+  send PUT /posts/1 with title "Updated Title", body "Updated body"
+  expect status 200
+
+test "DELETE /posts/:id deletes a post"
+  send DELETE /posts/1
+  expect status 200

@@ -23,6 +23,7 @@ import { generateAuthMiddleware, generateRouteWithAuth } from '../codegen/authMi
 import { generateImports, resetImports, addImport } from '../codegen/imports.js';
 import { generateSocketHandler } from '../codegen/socket.js';
 import { generateJob } from '../codegen/jobs.js';
+import { generateTestFile } from '../codegen/tests.js';
 import { resolveImports } from '../compiler/resolve.js';
 
 // Codegen backends
@@ -448,6 +449,48 @@ async function cmdDev(filePath, dbOverride = null) {
   });
 }
 
+/**
+ * trionary test <file>
+ * Compiles test blocks in a .tri file to a Jest test file and runs it.
+ *
+ * @param {string} filePath
+ */
+async function cmdTest(filePath) {
+  const triPath = resolveTriFile(filePath);
+
+  if (!existsSync(triPath)) {
+    throw new TrinaryError(`File not found: ${triPath}`, { source: 'cli' });
+  }
+
+  const source = await readFile(triPath, 'utf8');
+  const ast = resolveImports(parse(tokenize(source)), triPath);
+
+  const testNodes = ast.body.filter((n) => n.type === 'Test');
+  if (testNodes.length === 0) {
+    console.log('⚠ No test blocks found in the source file.');
+    return;
+  }
+
+  const testCode = generateTestFile(testNodes);
+  const base = basename(triPath, '.tri');
+  const testFilePath = resolve(dirname(triPath), `${base}.test.js`);
+  await writeFile(testFilePath, testCode, 'utf8');
+  console.log(`✅ Test file written to ${testFilePath}`);
+
+  const jestBinName = process.platform === 'win32' ? 'jest.cmd' : 'jest';
+  const jestBin = resolve(dirname(triPath), 'node_modules', '.bin', jestBinName);
+  const jestArgs = [existsSync(jestBin) ? jestBin : jestBinName, testFilePath];
+  const jestProcess = spawn(process.execPath, jestArgs, {
+    stdio: 'inherit',
+    env: { ...process.env },
+    cwd: dirname(triPath),
+  });
+
+  jestProcess.on('close', (code) => {
+    process.exit(code ?? 0);
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Error handling
 // ---------------------------------------------------------------------------
@@ -512,9 +555,19 @@ async function main() {
         break;
       }
 
+      case 'test': {
+        const file = args[0];
+        if (!file) {
+          process.stderr.write('Usage: trionary test <file>\n');
+          process.exit(1);
+        }
+        await cmdTest(file);
+        break;
+      }
+
       default:
         process.stderr.write(
-          'Usage:\n  trionary init\n  trionary build <file> [--db <mongodb|postgres>]\n  trionary dev <file> [--db <mongodb|postgres>]\n',
+          'Usage:\n  trionary init\n  trionary build <file> [--db <mongodb|postgres>]\n  trionary dev <file> [--db <mongodb|postgres>]\n  trionary test <file>\n',
         );
         process.exit(1);
     }

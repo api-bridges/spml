@@ -37,6 +37,9 @@ import {
   SocketNode,
   BroadcastNode,
   JobNode,
+  TestNode,
+  SendNode,
+  ExpectNode,
 } from './ast.js';
 
 // Token types that represent explicit scalar field types
@@ -162,6 +165,7 @@ class Parser {
         case 'route':      return this.parseRoute();
         case 'socket':     return this.parseSocket();
         case 'job':        return this.parseJob();
+        case 'test':       return this.parseTest();
       }
     }
     if (t.type === TOKEN_TYPES.IMPORT) {
@@ -169,7 +173,7 @@ class Parser {
     }
     throw new TrinaryError(interpolate(MESSAGES.UNEXPECTED_TOP_LEVEL, { token: `${t.type}(${t.value})` }), {
       line: t.line, col: t.col, source: 'parser',
-      hint: 'Valid top-level keywords are: server, database, import, job, middleware, route, socket.',
+      hint: 'Valid top-level keywords are: server, database, import, job, middleware, route, socket, test.',
     });
   }
 
@@ -658,6 +662,97 @@ class Parser {
     this.consumeNewline();
     const body = this.parseBlock();
     return JobNode(schedule, body);
+  }
+
+  // test "<description>"
+  //   send <METHOD> <path> [with <field> "<value>", ...]
+  //   expect status <code>
+  //   expect body.<field> exists
+  //   expect body.<field> "<value>"
+  parseTest() {
+    this.expect(TOKEN_TYPES.KEYWORD, 'test');
+    const descToken = this.expect(TOKEN_TYPES.STRING);
+    this.consumeNewline();
+    const body = this.parseTestBlock();
+    return TestNode(descToken.value, body);
+  }
+
+  parseTestBlock() {
+    const body = [];
+    if (!this.check(TOKEN_TYPES.INDENT)) return body;
+    this.advance(); // consume INDENT
+    this.skipNewlines();
+    while (!this.check(TOKEN_TYPES.DEDENT) && !this.check(TOKEN_TYPES.EOF)) {
+      const t = this.peek();
+      if (t.type === TOKEN_TYPES.KEYWORD && t.value === 'send') {
+        body.push(this.parseSend());
+      } else if (t.type === TOKEN_TYPES.KEYWORD && t.value === 'expect') {
+        body.push(this.parseExpect());
+      } else {
+        break;
+      }
+      this.skipNewlines();
+    }
+    if (this.check(TOKEN_TYPES.DEDENT)) this.advance();
+    return body;
+  }
+
+  // send <METHOD> <path> [with <field> "<value>", ...]
+  parseSend() {
+    this.expect(TOKEN_TYPES.KEYWORD, 'send');
+    const methodToken = this.expect(TOKEN_TYPES.KEYWORD);
+    const pathParts = [];
+    while (!this.isLineEnd()) {
+      const t = this.peek();
+      if (t.type === TOKEN_TYPES.KEYWORD && t.value === 'with') break;
+      pathParts.push(this.advance().value);
+    }
+    const path = pathParts.join('');
+    let fields = [];
+    if (this.match(TOKEN_TYPES.KEYWORD, 'with')) {
+      fields = this.parseSendFields();
+    }
+    this.consumeNewline();
+    return SendNode(methodToken.value, path, fields);
+  }
+
+  // Parse comma-separated <fieldName> "<value>" pairs
+  parseSendFields() {
+    const fields = [];
+    do {
+      const nameToken = this.expectIdentifierOrKeyword();
+      const valueToken = this.expect(TOKEN_TYPES.STRING);
+      fields.push({ name: nameToken.value, value: valueToken.value });
+    } while (this.match(TOKEN_TYPES.OPERATOR, ','));
+    return fields;
+  }
+
+  // expect status <code>
+  // expect body.<field> exists
+  // expect body.<field> "<value>"
+  parseExpect() {
+    this.expect(TOKEN_TYPES.KEYWORD, 'expect');
+    if (this.match(TOKEN_TYPES.KEYWORD, 'status')) {
+      const codeToken = this.expect(TOKEN_TYPES.NUMBER);
+      this.consumeNewline();
+      return ExpectNode('status', { code: parseNumber(codeToken) });
+    }
+    if (this.match(TOKEN_TYPES.KEYWORD, 'body')) {
+      this.expect(TOKEN_TYPES.OPERATOR, '.');
+      const fieldToken = this.expectIdentifierOrKeyword();
+      if (this.match(TOKEN_TYPES.KEYWORD, 'exists')) {
+        this.consumeNewline();
+        return ExpectNode('body', { path: fieldToken.value, check: 'exists' });
+      }
+      const valueToken = this.expect(TOKEN_TYPES.STRING);
+      this.consumeNewline();
+      return ExpectNode('body', { path: fieldToken.value, check: { equals: valueToken.value } });
+    }
+    const t = this.peek();
+    throw new TrinaryError(
+      `Expected 'status' or 'body' after 'expect', got ${t.type}(${t.value})`,
+      { line: t.line, col: t.col, source: 'parser' },
+    );
   }
 
   // broadcast <data>
