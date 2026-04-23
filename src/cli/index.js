@@ -477,8 +477,9 @@ async function cmdTest(filePath) {
   await writeFile(testFilePath, testCode, 'utf8');
   console.log(`✅ Test file written to ${testFilePath}`);
 
-  const jestBin = resolve(dirname(triPath), 'node_modules', '.bin', 'jest');
-  const jestArgs = [existsSync(jestBin) ? jestBin : 'jest', testFilePath];
+  const jestBinName = process.platform === 'win32' ? 'jest.cmd' : 'jest';
+  const jestBin = resolve(dirname(triPath), 'node_modules', '.bin', jestBinName);
+  const jestArgs = [existsSync(jestBin) ? jestBin : jestBinName, testFilePath];
   const jestProcess = spawn(process.execPath, jestArgs, {
     stdio: 'inherit',
     env: { ...process.env },

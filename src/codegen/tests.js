@@ -3,6 +3,8 @@
 // Each TestNode compiles to a describe/it block using supertest to exercise the compiled app.
 // All generators return strings; no file I/O is performed here.
 
+const INDENT = '    '; // 4 spaces — one level inside the `it()` block
+
 /**
  * Derive a human-readable `it()` description from a TestNode's expectations.
  *
@@ -34,7 +36,7 @@ function generateSendCall(node) {
       .join(', ');
     chain += `.send({ ${bodyObj} })`;
   }
-  return `    const res = await ${chain};`;
+  return `${INDENT}const res = await ${chain};`;
 }
 
 /**
@@ -45,14 +47,14 @@ function generateSendCall(node) {
  */
 function generateExpectAssertion(node) {
   if (node.expectType === 'status') {
-    return `    expect(res.status).toBe(${node.assertion.code});`;
+    return `${INDENT}expect(res.status).toBe(${node.assertion.code});`;
   }
   if (node.expectType === 'body') {
     const prop = `res.body.${node.assertion.path}`;
     if (node.assertion.check === 'exists') {
-      return `    expect(${prop}).toBeDefined();`;
+      return `${INDENT}expect(${prop}).toBeDefined();`;
     }
-    return `    expect(${prop}).toBe('${node.assertion.check.equals}');`;
+    return `${INDENT}expect(${prop}).toBe('${node.assertion.check.equals}');`;
   }
   return '';
 }
