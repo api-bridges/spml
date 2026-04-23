@@ -20,6 +20,7 @@ import { generateMiddleware, generateCustomMiddleware, getCustomPackages, resetC
 import { generateAuthStatements } from '../codegen/auth.js';
 import { generateAuthMiddleware, generateRouteWithAuth } from '../codegen/authMiddleware.js';
 import { generateImports, resetImports, addImport } from '../codegen/imports.js';
+import { resolveImports } from '../compiler/resolve.js';
 
 // Codegen backends
 import * as mongooseBackend from '../codegen/backends/mongoose.js';
@@ -287,8 +288,8 @@ async function cmdBuild(filePath, dbOverride = null) {
 
   const source = await readFile(triPath, 'utf8');
 
-  // Parse once; reuse the AST for both compilation and env-var collection
-  const ast = parse(tokenize(source));
+  // Parse once; run the import resolver; reuse the AST for both compilation and env-var collection
+  const ast = resolveImports(parse(tokenize(source)), triPath);
   const output = compileAst(ast, dbOverride);
   const outPath = outputPath(triPath);
 

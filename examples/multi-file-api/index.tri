@@ -1,0 +1,9 @@
+server port 3000
+
+database connect "mongodb://localhost/myapp"
+
+middleware cors
+middleware logs
+
+import routes from "posts"
+import routes from "users"

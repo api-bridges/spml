@@ -22,4 +22,7 @@ export const TOKEN_TYPES = Object.freeze({
   MAX_LENGTH: 'MAX_LENGTH',
   IS_ONE_OF: 'IS_ONE_OF',
   ENV: 'ENV',
+  IMPORT: 'IMPORT',
+  ROUTES: 'ROUTES',
+  FROM: 'FROM',
 });

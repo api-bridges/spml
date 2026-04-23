@@ -94,3 +94,7 @@ export function PopulateNode(model, field) {
 export function MiddlewareNode(packageName) {
   return { type: 'Middleware', packageName };
 }
+
+export function ImportNode(path) {
+  return { type: 'Import', path };
+}
