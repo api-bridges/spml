@@ -21,4 +21,5 @@ export const TOKEN_TYPES = Object.freeze({
   IS_URL: 'IS_URL',
   MAX_LENGTH: 'MAX_LENGTH',
   IS_ONE_OF: 'IS_ONE_OF',
+  ENV: 'ENV',
 });

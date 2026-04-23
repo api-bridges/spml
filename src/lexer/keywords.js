@@ -68,4 +68,5 @@ export const KEYWORDS = new Set([
   'url',
   'one',
   'of',
+  'env',
 ]);

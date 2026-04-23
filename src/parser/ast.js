@@ -7,12 +7,12 @@ export function ProgramNode(body) {
   return { type: 'Program', body };
 }
 
-export function ServerDeclarationNode(port) {
-  return { type: 'ServerDeclaration', port };
+export function ServerDeclarationNode(port, envVar = null) {
+  return { type: 'ServerDeclaration', port, envVar };
 }
 
-export function DatabaseDeclarationNode(uri) {
-  return { type: 'DatabaseDeclaration', uri };
+export function DatabaseDeclarationNode(uri, envVar = null) {
+  return { type: 'DatabaseDeclaration', uri, envVar };
 }
 
 export function MiddlewareDeclarationNode(name, options) {

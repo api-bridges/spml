@@ -21,6 +21,13 @@ exports[`generateDatabase() matches snapshot 1`] = `
 });"
 `;
 
+exports[`generateDatabase() matches snapshot with envVar 1`] = `
+"mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});"
+`;
+
 exports[`generateMiddleware() matches snapshot for ratelimit 1`] = `"app.use(rateLimit({ windowMs: 60000, max: 200 }));"`;
 
 exports[`generateRouteWithAuth() matches snapshot with auth 1`] = `

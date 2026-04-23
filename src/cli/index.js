@@ -15,7 +15,7 @@ import { spawn } from 'child_process';
 import { tokenize } from '../lexer/lexer.js';
 import { parse } from '../parser/parser.js';
 import { TrinaryError } from '../errors/TrinaryError.js';
-import { generateServer } from '../codegen/server.js';
+import { generateServer, generateEnvExample } from '../codegen/server.js';
 import { generateDatabase } from '../codegen/database.js';
 import { generateMiddleware } from '../codegen/middleware.js';
 import { generateAuthStatements } from '../codegen/auth.js';
@@ -94,7 +94,10 @@ export function compile(source) {
       case 'ServerDeclaration': {
         addImport('express', 'express');
         serverSection.push(`const app = express();`);
-        serverSection.push(`const PORT = ${node.port};`);
+        const portExpr = node.envVar
+          ? `process.env.${node.envVar} || 3000`
+          : node.port;
+        serverSection.push(`const PORT = ${portExpr};`);
         listenSection.push(
           `app.listen(PORT, () => {\n  console.log(\`Server running on port \${PORT}\`);\n});`,
         );
@@ -228,6 +231,8 @@ function outputPath(triPath) {
 /**
  * trionary build <file>
  * Compiles a .tri file and writes the output .js next to it.
+ * If the source references any env vars (via `env` keyword), a `.env.example`
+ * file is written alongside the compiled output.
  *
  * @param {string} filePath
  * @returns {Promise<string>} The resolved output path.
@@ -240,11 +245,32 @@ async function cmdBuild(filePath) {
   }
 
   const source = await readFile(triPath, 'utf8');
+
+  // Parse the AST so we can collect referenced env vars before compiling
+  const ast = parse(tokenize(source));
+
   const output = compile(source);
   const outPath = outputPath(triPath);
 
   await writeFile(outPath, output, 'utf8');
   console.log(`✅ Compiled to ${outPath}`);
+
+  // Collect env var names referenced in the source
+  const envVars = [];
+  for (const node of ast.body) {
+    if (node.type === 'ServerDeclaration' && node.envVar) {
+      envVars.push(node.envVar);
+    }
+    if (node.type === 'DatabaseDeclaration' && node.envVar) {
+      envVars.push(node.envVar);
+    }
+  }
+
+  if (envVars.length > 0) {
+    const envExamplePath = resolve(dirname(outPath), '.env.example');
+    await writeFile(envExamplePath, generateEnvExample(envVars), 'utf8');
+    console.log(`✅ Written ${envExamplePath}`);
+  }
 
   return outPath;
 }
