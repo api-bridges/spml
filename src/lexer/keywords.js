@@ -90,4 +90,8 @@ export const KEYWORDS = new Set([
   'minutes',
   'hours',
   'seconds',
+  'test',
+  'send',
+  'expect',
+  'body',
 ]);

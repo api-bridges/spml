@@ -114,3 +114,15 @@ export function BroadcastNode(data) {
 export function JobNode(schedule, body) {
   return { type: 'Job', schedule, body };
 }
+
+export function TestNode(description, body) {
+  return { type: 'Test', description, body };
+}
+
+export function SendNode(method, path, fields) {
+  return { type: 'Send', method, path, fields };
+}
+
+export function ExpectNode(expectType, assertion) {
+  return { type: 'Expect', expectType, assertion };
+}
