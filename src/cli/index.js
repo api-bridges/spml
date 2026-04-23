@@ -111,7 +111,6 @@ export function compileAst(ast, dbOverride = null) {
   // Pre-scan: detect whether any SocketNodes are present so we can adjust
   // the server startup to use http.createServer instead of app.listen directly.
   const hasSocket = ast.body.some((n) => n.type === 'Socket');
-  const hasJob = ast.body.some((n) => n.type === 'Job');
 
   for (const node of ast.body) {
     switch (node.type) {

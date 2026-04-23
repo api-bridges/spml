@@ -14,8 +14,11 @@ function generateJobBody(body, indent = '  ') {
   if (!body || body.length === 0) {
     return `${indent}// scheduled task body`;
   }
-  // Each node in the body is rendered as a descriptive comment so that the
-  // emitted output is always valid JavaScript regardless of statement type.
+  // TODO: Implement full CRUD codegen for job body statements (Delete, Find, etc.).
+  // For now each node is rendered as a descriptive comment so the emitted output
+  // is always valid JavaScript.  The schedule wiring (cron.schedule call and
+  // node-cron import) is fully functional; body codegen can be extended in a
+  // follow-up step.
   return body.map((node) => `${indent}// ${node.type}`).join('\n');
 }
 

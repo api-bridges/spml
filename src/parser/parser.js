@@ -169,7 +169,7 @@ class Parser {
     }
     throw new TrinaryError(interpolate(MESSAGES.UNEXPECTED_TOP_LEVEL, { token: `${t.type}(${t.value})` }), {
       line: t.line, col: t.col, source: 'parser',
-      hint: 'Valid top-level keywords are: server, database, middleware, route, import, socket, job.',
+      hint: 'Valid top-level keywords are: server, database, import, job, middleware, route, socket.',
     });
   }
 
