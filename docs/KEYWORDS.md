@@ -140,6 +140,34 @@ await Post.findByIdAndUpdate(req.params.id, { $set: updates }, { new: true });
 
 ---
 
+## Streaming (Server-Sent Events)
+
+| Keyword | Role | Example |
+|---|---|---|
+| `stream` | Begin a Server-Sent Events response (used with `events`) | `stream events` |
+| `events` | Marks the stream as an SSE event stream (used with `stream`) | `stream events` |
+
+The `stream events` statement compiles to a Server-Sent Events (SSE) Express route that sets the required response headers and flushes them to the client, establishing a persistent push connection.
+
+**Generated output:**
+
+```js
+res.setHeader('Content-Type', 'text/event-stream');
+res.setHeader('Cache-Control', 'no-cache');
+res.setHeader('Connection', 'keep-alive');
+res.flushHeaders();
+// developer fills in the event data
+```
+
+**Example:**
+
+```tri
+route GET /events/live
+  stream events
+```
+
+---
+
 ## Validation Rules Reference
 
 The `validate` keyword supports the following rules:

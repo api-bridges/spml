@@ -1,0 +1,13 @@
+server port 3000
+
+database connect "mongodb://localhost/sse-demo"
+
+middleware cors
+middleware logs
+
+route GET /events/live
+  stream events
+
+route GET /notifications/:userId
+  auth required
+  stream events

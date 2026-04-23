@@ -98,3 +98,7 @@ export function MiddlewareNode(packageName) {
 export function ImportNode(path) {
   return { type: 'Import', path };
 }
+
+export function StreamNode() {
+  return { type: 'Stream' };
+}
