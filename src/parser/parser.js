@@ -32,6 +32,7 @@ import {
   EscapeHatchNode,
   FieldNode,
   PopulateNode,
+  ImportNode,
 } from './ast.js';
 
 // Token types that represent explicit scalar field types
@@ -157,9 +158,12 @@ class Parser {
         case 'route':      return this.parseRoute();
       }
     }
+    if (t.type === TOKEN_TYPES.IMPORT) {
+      return this.parseImport();
+    }
     throw new TrinaryError(interpolate(MESSAGES.UNEXPECTED_TOP_LEVEL, { token: `${t.type}(${t.value})` }), {
       line: t.line, col: t.col, source: 'parser',
-      hint: 'Valid top-level keywords are: server, database, middleware, route.',
+      hint: 'Valid top-level keywords are: server, database, middleware, route, import.',
     });
   }
 
@@ -230,6 +234,16 @@ class Parser {
     }
     this.consumeNewline();
     return MiddlewareDeclarationNode(nameToken.value, options);
+  }
+
+  // import routes from "<path>"
+  parseImport() {
+    this.expect(TOKEN_TYPES.IMPORT);
+    this.expect(TOKEN_TYPES.ROUTES);
+    this.expect(TOKEN_TYPES.FROM);
+    const pathToken = this.expect(TOKEN_TYPES.STRING);
+    this.consumeNewline();
+    return ImportNode(pathToken.value);
   }
 
   // route <METHOD> <path>

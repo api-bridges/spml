@@ -72,4 +72,7 @@ export const KEYWORDS = new Set([
   'type',
   'mongodb',
   'postgres',
+  'import',
+  'routes',
+  'from',
 ]);
