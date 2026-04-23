@@ -77,4 +77,7 @@ export const KEYWORDS = new Set([
   'from',
   'stream',
   'events',
+  'socket',
+  'on',
+  'broadcast',
 ]);

@@ -34,6 +34,8 @@ import {
   PopulateNode,
   ImportNode,
   StreamNode,
+  SocketNode,
+  BroadcastNode,
 } from './ast.js';
 
 // Token types that represent explicit scalar field types
@@ -52,7 +54,7 @@ const BODY_KEYWORDS = new Set([
 
 // Human-readable list of valid statement-level keywords (used in error hints)
 const STATEMENT_KEYWORDS_LIST =
-  'auth, take, require, validate, find, create, update, delete, return, exists, if, hash, paginate, populate, stream';
+  'auth, take, require, validate, find, create, update, delete, return, exists, if, hash, paginate, populate, stream, broadcast';
 
 // Parse a numeric string, throwing a structured error if the result is NaN.
 function parseNumber(token) {
@@ -157,6 +159,7 @@ class Parser {
         case 'database':   return this.parseDatabaseDeclaration();
         case 'middleware': return this.parseMiddlewareDeclaration();
         case 'route':      return this.parseRoute();
+        case 'socket':     return this.parseSocket();
       }
     }
     if (t.type === TOKEN_TYPES.IMPORT) {
@@ -164,7 +167,7 @@ class Parser {
     }
     throw new TrinaryError(interpolate(MESSAGES.UNEXPECTED_TOP_LEVEL, { token: `${t.type}(${t.value})` }), {
       line: t.line, col: t.col, source: 'parser',
-      hint: 'Valid top-level keywords are: server, database, middleware, route, import.',
+      hint: 'Valid top-level keywords are: server, database, middleware, route, import, socket.',
     });
   }
 
@@ -296,6 +299,7 @@ class Parser {
         case 'paginate': return this.parsePaginate();
         case 'populate': return this.parsePopulate();
         case 'stream':   return this.parseStream();
+        case 'broadcast': return this.parseBroadcast();
       }
     }
     // Escape hatch: `js:` block or legacy `escape` identifier
@@ -557,6 +561,51 @@ class Parser {
     this.expect(TOKEN_TYPES.KEYWORD, 'events');
     this.consumeNewline();
     return StreamNode();
+  }
+
+  // socket <path>
+  //   on <event>
+  //     <block>
+  parseSocket() {
+    this.expect(TOKEN_TYPES.KEYWORD, 'socket');
+    const pathParts = [];
+    while (!this.isLineEnd()) {
+      pathParts.push(this.advance().value);
+    }
+    this.consumeNewline();
+
+    let event = 'message';
+    let body = [];
+
+    if (this.check(TOKEN_TYPES.INDENT)) {
+      this.advance(); // consume INDENT
+      this.skipNewlines();
+      if (this.check(TOKEN_TYPES.KEYWORD) && this.peek().value === 'on') {
+        this.advance(); // consume 'on'
+        const eventToken = this.expectIdentifierOrKeyword();
+        event = eventToken.value;
+        this.consumeNewline();
+        body = this.parseBlock();
+      }
+      // Skip any remaining top-level content inside the socket block.
+      // Only the first `on <event>` handler is compiled; additional content
+      // at this indentation level is currently unsupported and skipped to
+      // allow forward-compatible extension of the socket block syntax.
+      while (!this.check(TOKEN_TYPES.DEDENT) && !this.check(TOKEN_TYPES.EOF)) {
+        this.advance();
+      }
+      if (this.check(TOKEN_TYPES.DEDENT)) this.advance();
+    }
+
+    return SocketNode(pathParts.join(''), event, body);
+  }
+
+  // broadcast <data>
+  parseBroadcast() {
+    this.expect(TOKEN_TYPES.KEYWORD, 'broadcast');
+    const dataToken = this.expectIdentifierOrKeyword();
+    this.consumeNewline();
+    return BroadcastNode(dataToken.value);
   }
 
   // js:

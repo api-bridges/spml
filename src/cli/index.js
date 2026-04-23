@@ -10,6 +10,7 @@ import { readFile, writeFile } from 'fs/promises';
 import { existsSync, mkdirSync } from 'fs';
 import { resolve, dirname, basename, extname } from 'path';
 import { createRequire } from 'module';
+import { fileURLToPath } from 'url';
 import { spawn } from 'child_process';
 
 import { tokenize } from '../lexer/lexer.js';
@@ -20,6 +21,7 @@ import { generateMiddleware, generateCustomMiddleware, getCustomPackages, resetC
 import { generateAuthStatements } from '../codegen/auth.js';
 import { generateAuthMiddleware, generateRouteWithAuth } from '../codegen/authMiddleware.js';
 import { generateImports, resetImports, addImport } from '../codegen/imports.js';
+import { generateSocketHandler } from '../codegen/socket.js';
 import { resolveImports } from '../compiler/resolve.js';
 
 // Codegen backends
@@ -101,7 +103,12 @@ export function compileAst(ast, dbOverride = null) {
   const dbSection = [];
   const middlewareSection = [];
   const routeSection = [];
+  const socketSection = [];
   let needsAuthMiddleware = false;
+
+  // Pre-scan: detect whether any SocketNodes are present so we can adjust
+  // the server startup to use http.createServer instead of app.listen directly.
+  const hasSocket = ast.body.some((n) => n.type === 'Socket');
 
   for (const node of ast.body) {
     switch (node.type) {
@@ -112,9 +119,19 @@ export function compileAst(ast, dbOverride = null) {
           ? `process.env.${node.envVar} || 3000`
           : node.port;
         serverSection.push(`const PORT = ${portExpr};`);
-        listenSection.push(
-          `app.listen(PORT, () => {\n  console.log(\`Server running on port \${PORT}\`);\n});`,
-        );
+        if (hasSocket) {
+          addImport('http', 'http');
+          addImport('ws', '{ WebSocket, WebSocketServer }');
+          serverSection.push(`const _server = http.createServer(app);`);
+          serverSection.push(`const _wss = new WebSocketServer({ server: _server });`);
+          listenSection.push(
+            `_server.listen(PORT, () => {\n  console.log(\`Server running on port \${PORT}\`);\n});`,
+          );
+        } else {
+          listenSection.push(
+            `app.listen(PORT, () => {\n  console.log(\`Server running on port \${PORT}\`);\n});`,
+          );
+        }
         break;
       }
 
@@ -151,6 +168,11 @@ export function compileAst(ast, dbOverride = null) {
         routeSection.push(
           generateRouteWithAuth(node.method.toLowerCase(), node.path, handlerBody, authRequired),
         );
+        break;
+      }
+
+      case 'Socket': {
+        socketSection.push(generateSocketHandler(node));
         break;
       }
 
@@ -192,6 +214,8 @@ export function compileAst(ast, dbOverride = null) {
   if (needsAuthMiddleware) sections.push(generateAuthMiddleware());
 
   if (routeSection.length) sections.push(routeSection.join('\n\n'));
+
+  if (socketSection.length) sections.push(socketSection.join('\n\n'));
 
   if (listenSection.length) sections.push(listenSection.join('\n'));
 
@@ -486,4 +510,7 @@ async function main() {
   }
 }
 
-main();
+// Only run the CLI when this file is executed directly (not when imported as a module in tests).
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main();
+}
