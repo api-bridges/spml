@@ -17,7 +17,7 @@ import { parse } from '../parser/parser.js';
 import { TrinaryError } from '../errors/TrinaryError.js';
 import { generateServer, generateEnvExample } from '../codegen/server.js';
 import { generateDatabase } from '../codegen/database.js';
-import { generateMiddleware } from '../codegen/middleware.js';
+import { generateMiddleware, generateCustomMiddleware, getCustomPackages, resetCustomPackages } from '../codegen/middleware.js';
 import { generateAuthStatements } from '../codegen/auth.js';
 import { generateAuthMiddleware, generateRouteWithAuth } from '../codegen/authMiddleware.js';
 import { generateCrudStatements } from '../codegen/crud.js';
@@ -84,6 +84,7 @@ function inferModelName(routePath) {
  */
 export function compileAst(ast) {
   resetImports();
+  resetCustomPackages();
 
   const serverSection = [];
   const listenSection = [];
@@ -115,6 +116,11 @@ export function compileAst(ast) {
 
       case 'MiddlewareDeclaration': {
         middlewareSection.push(generateMiddleware(node));
+        break;
+      }
+
+      case 'Middleware': {
+        middlewareSection.push(generateCustomMiddleware(node));
         break;
       }
 
@@ -284,6 +290,23 @@ async function cmdBuild(filePath) {
     const envExamplePath = resolve(dirname(outPath), '.env.example');
     await writeFile(envExamplePath, generateEnvExample(envVars), 'utf8');
     console.log(`✅ Written ${envExamplePath}`);
+  }
+
+  // Generate package.json with custom middleware package dependencies
+  const customPkgs = getCustomPackages();
+  if (customPkgs.length > 0) {
+    const pkgJsonPath = resolve(dirname(outPath), 'package.json');
+    if (existsSync(pkgJsonPath)) {
+      console.warn(`⚠ ${pkgJsonPath} already exists — skipping package.json generation. Add these packages manually: ${customPkgs.join(', ')}`);
+    } else {
+      const dependencies = {};
+      for (const pkg of customPkgs) {
+        dependencies[pkg] = '*';
+      }
+      const pkgJson = JSON.stringify({ dependencies }, null, 2) + '\n';
+      await writeFile(pkgJsonPath, pkgJson, 'utf8');
+      console.log(`✅ Written ${pkgJsonPath} — pin dependency versions before deploying to production.`);
+    }
   }
 
   return outPath;

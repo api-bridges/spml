@@ -13,6 +13,7 @@ import {
   ServerDeclarationNode,
   DatabaseDeclarationNode,
   MiddlewareDeclarationNode,
+  MiddlewareNode,
   RouteNode,
   AuthNode,
   TakeNode,
@@ -186,9 +187,15 @@ class Parser {
   }
 
   // middleware <name> [max <n> per minute]
+  // middleware <packageName>  — any npm package name (IDENTIFIER token)
   parseMiddlewareDeclaration() {
     this.expect(TOKEN_TYPES.KEYWORD, 'middleware');
     const nameToken = this.expectIdentifierOrKeyword();
+    // Non-keyword tokens are arbitrary npm package names → MiddlewareNode
+    if (nameToken.type === TOKEN_TYPES.IDENTIFIER) {
+      this.consumeNewline();
+      return MiddlewareNode(nameToken.value);
+    }
     const options = {};
     if (nameToken.value === 'ratelimit' && !this.isLineEnd()) {
       if (this.match(TOKEN_TYPES.KEYWORD, 'max')) {

@@ -1,11 +1,14 @@
 import { describe, it, expect, beforeEach } from '@jest/globals';
 import { generateDatabase } from '../../src/codegen/database.js';
 import { resetImports, generateImports } from '../../src/codegen/imports.js';
-import { generateMiddleware } from '../../src/codegen/middleware.js';
+import { generateMiddleware, generateCustomMiddleware, getCustomPackages, resetCustomPackages } from '../../src/codegen/middleware.js';
 import { generateAuthMiddleware, generateRouteWithAuth } from '../../src/codegen/authMiddleware.js';
 
-// Reset import registry before each test so tests are independent
-beforeEach(() => resetImports());
+// Reset import registry and custom package registry before each test so tests are independent
+beforeEach(() => {
+  resetImports();
+  resetCustomPackages();
+});
 
 // ── database ─────────────────────────────────────────────────────────────────
 
@@ -82,6 +85,46 @@ describe('generateMiddleware()', () => {
 
   it('matches snapshot for ratelimit', () => {
     const output = generateMiddleware({ type: 'MiddlewareDeclaration', name: 'ratelimit', options: { max: 200 } });
+    expect(output).toMatchSnapshot();
+  });
+});
+
+// ── custom npm middleware ─────────────────────────────────────────────────────
+
+describe('generateCustomMiddleware()', () => {
+  it('emits app.use(require(...)) for a custom npm package', () => {
+    const output = generateCustomMiddleware({ type: 'Middleware', packageName: 'morgan' });
+    expect(output).toBe("app.use(require('morgan'));");
+  });
+
+  it('registers the package in the custom package registry', () => {
+    generateCustomMiddleware({ type: 'Middleware', packageName: 'morgan' });
+    expect(getCustomPackages()).toContain('morgan');
+  });
+
+  it('registers multiple distinct custom packages', () => {
+    generateCustomMiddleware({ type: 'Middleware', packageName: 'morgan' });
+    generateCustomMiddleware({ type: 'Middleware', packageName: 'helmet' });
+    const pkgs = getCustomPackages();
+    expect(pkgs).toContain('morgan');
+    expect(pkgs).toContain('helmet');
+    expect(pkgs).toHaveLength(2);
+  });
+
+  it('does not duplicate packages registered twice', () => {
+    generateCustomMiddleware({ type: 'Middleware', packageName: 'morgan' });
+    generateCustomMiddleware({ type: 'Middleware', packageName: 'morgan' });
+    expect(getCustomPackages()).toHaveLength(1);
+  });
+
+  it('resetCustomPackages clears the registry', () => {
+    generateCustomMiddleware({ type: 'Middleware', packageName: 'morgan' });
+    resetCustomPackages();
+    expect(getCustomPackages()).toHaveLength(0);
+  });
+
+  it('matches snapshot', () => {
+    const output = generateCustomMiddleware({ type: 'Middleware', packageName: 'morgan' });
     expect(output).toMatchSnapshot();
   });
 });
