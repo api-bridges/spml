@@ -38,3 +38,4 @@
 - Step 34 ✅ Built-in test DSL implemented; test blocks compile to Jest/supertest; trionary test CLI command added.
 - Step 35 ✅ Plugin API implemented; keywords, AST nodes, and emitters can be registered at runtime via trionary.config.js.
 - Step 36 ✅ SQLite database target added; database type sqlite emits Prisma schema with sqlite provider and file:./dev.db URL.
+- Step 37 ✅ Automated semantic-release pipeline configured; CHANGELOG.md auto-generated; Conventional Commits enforced.
