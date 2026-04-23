@@ -1,0 +1,9 @@
+server port env PORT
+
+database connect env MONGODB_URI
+
+middleware cors
+middleware logs
+
+route GET /health
+  return ok

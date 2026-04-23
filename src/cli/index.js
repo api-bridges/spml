@@ -35,6 +35,7 @@ import * as sqliteBackend from '../codegen/backends/sqlite.js';
 import { emitters as pluginEmitters, applyKeywords } from '../plugin/index.js';
 import { KEYWORDS } from '../lexer/keywords.js';
 import { loadConfig } from './config.js';
+import { cmdNew } from './new.js';
 
 // ---------------------------------------------------------------------------
 // Compiler — tokenize → parse → codegen
@@ -559,6 +560,12 @@ async function main() {
 
   try {
     switch (command) {
+      case 'new': {
+        const nameArg = args[0];
+        await cmdNew(nameArg);
+        break;
+      }
+
       case 'init':
         await cmdInit();
         break;
@@ -595,7 +602,7 @@ async function main() {
 
       default:
         process.stderr.write(
-          'Usage:\n  trionary init\n  trionary build <file> [--db <mongodb|postgres|sqlite>]\n  trionary dev <file> [--db <mongodb|postgres|sqlite>]\n  trionary test <file>\n',
+          'Usage:\n  trionary new [project-name]\n  trionary init\n  trionary build <file> [--db <mongodb|postgres|sqlite>]\n  trionary dev <file> [--db <mongodb|postgres|sqlite>]\n  trionary test <file>\n',
         );
         process.exit(1);
     }

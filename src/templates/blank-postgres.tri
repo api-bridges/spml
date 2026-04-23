@@ -1,0 +1,10 @@
+server port env PORT
+
+database type postgres
+database connect env DATABASE_URL
+
+middleware cors
+middleware logs
+
+route GET /health
+  return ok
