@@ -1,0 +1,23 @@
+server port 3000
+
+database connect "mongodb://localhost/myapp"
+
+# Built-in middleware keywords
+middleware cors
+middleware helmet
+
+# Custom npm package middleware — emitted as app.use(require('<pkg>'))
+middleware morgan
+
+route GET /health
+  return ok
+
+route GET /items
+  find all item
+  return items
+
+route POST /items
+  take name, description
+  require name
+  create item with name, description
+  return item

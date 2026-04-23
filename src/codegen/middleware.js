@@ -1,5 +1,6 @@
 // middleware.js
-// Generates app.use(...) middleware setup code from a MiddlewareDeclarationNode.
+// Generates app.use(...) middleware setup code from a MiddlewareDeclarationNode
+// or a MiddlewareNode (custom npm package).
 // Returns a string of Node.js code; no file I/O is performed here.
 
 import { addImport } from './imports.js';
@@ -16,6 +17,12 @@ const MIDDLEWARE_MAP = {
   helmet: { pkg: 'helmet', call: 'helmet()' },
   compress: { pkg: 'compression', call: 'compression()' },
 };
+
+/**
+ * Registry of custom npm package names declared via the MiddlewareNode path.
+ * @type {Set<string>}
+ */
+const customPackageRegistry = new Set();
 
 /**
  * Generate Express middleware setup code from a MiddlewareDeclarationNode.
@@ -56,4 +63,36 @@ export function generateMiddleware(node) {
   addImport(entry.pkg, localId);
   addImport('express', 'express');
   return `app.use(${entry.call});`;
+}
+
+/**
+ * Generate Express middleware setup code from a MiddlewareNode (custom npm package).
+ *
+ * Example Trionary: `middleware morgan`
+ * Produces: `app.use(require('morgan'));`
+ *
+ * @param {{ type: 'Middleware', packageName: string }} node
+ * @returns {string} Node.js source code string.
+ */
+export function generateCustomMiddleware(node) {
+  const pkg = node.packageName;
+  customPackageRegistry.add(pkg);
+  addImport('express', 'express');
+  return `app.use(require('${pkg}'));`;
+}
+
+/**
+ * Return the list of custom npm package names declared via MiddlewareNode.
+ *
+ * @returns {string[]}
+ */
+export function getCustomPackages() {
+  return [...customPackageRegistry];
+}
+
+/**
+ * Reset the custom package registry (useful between compilation runs or in tests).
+ */
+export function resetCustomPackages() {
+  customPackageRegistry.clear();
 }

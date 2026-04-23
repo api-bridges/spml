@@ -86,3 +86,7 @@ export function FieldNode(name, fieldType = 'String', ref = null) {
 export function PopulateNode(model, field) {
   return { type: 'Populate', model, field };
 }
+
+export function MiddlewareNode(packageName) {
+  return { type: 'Middleware', packageName };
+}

@@ -14,6 +14,8 @@ exports[`generateAuthMiddleware() matches snapshot 1`] = `
 };"
 `;
 
+exports[`generateCustomMiddleware() matches snapshot 1`] = `"app.use(require('morgan'));"`;
+
 exports[`generateDatabase() matches snapshot 1`] = `
 "mongoose.connect('mongodb://localhost/myapp', {
   useNewUrlParser: true,
