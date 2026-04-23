@@ -7,7 +7,7 @@ This guide takes you from a fresh machine to a running Trionary API in five step
 ## Prerequisites
 
 - **Node.js ≥ 18** — [nodejs.org](https://nodejs.org)
-- **MongoDB** — running locally on the default port (`27017`), or a hosted URI (e.g. MongoDB Atlas)
+- **MongoDB** — running locally on the default port (`27017`), or a hosted URI (e.g. MongoDB Atlas), unless you choose PostgreSQL or SQLite.
 
 ---
 
@@ -22,6 +22,7 @@ Verify the installation:
 ```bash
 trionary --help
 # Usage:
+#   trionary new [project-name]
 #   trionary init
 #   trionary build <file>
 #   trionary dev <file>
@@ -29,9 +30,64 @@ trionary --help
 
 ---
 
-## Step 2 — Initialise a project
+## Step 2 — Create a new project with `trionary new`
 
-Create a new directory and run `trionary init`:
+`trionary new` is the fastest way to get started. It scaffolds a full project directory, prompts you for the database type, authentication, and starter routes, then runs `npm install` for you.
+
+```bash
+trionary new my-api
+```
+
+You will be asked four short questions:
+
+```
+? Project name: my-api
+? Database type: › MongoDB (Mongoose)
+? Include authentication routes (register / login / /me)? › Yes
+? Starter routes: › Blog (posts + users)
+```
+
+When the command completes, your project is ready:
+
+```
+✅  Created my-api/
+   my-api/app.tri
+   my-api/.env
+   my-api/package.json
+
+📦  Installing dependencies…
+
+🎉  Your project is ready!
+
+   Next steps:
+
+     cd my-api
+     trionary dev app.tri
+```
+
+### What gets created
+
+| File | Purpose |
+|---|---|
+| `app.tri` | Trionary source file pre-filled with the routes you chose |
+| `.env` | Environment variables (port, database URL, JWT secret) |
+| `package.json` | Minimal npm package descriptor |
+
+> **Important:** Change `JWT_SECRET` in `.env` to a long random string before deploying to production.
+
+### Prompt options
+
+| Prompt | Options |
+|---|---|
+| Database type | `MongoDB (Mongoose)`, `PostgreSQL (Prisma)`, `SQLite (Prisma)` |
+| Authentication | `Yes` / `No` — adds register, login, and `/me` routes |
+| Starter routes | `Blog (posts + users)`, `E-commerce (products + orders)`, `Blank` |
+
+---
+
+## (Alternative) Initialise a minimal project manually
+
+If you prefer a bare-bones starting point, create a new directory and run `trionary init`:
 
 ```bash
 mkdir my-api && cd my-api

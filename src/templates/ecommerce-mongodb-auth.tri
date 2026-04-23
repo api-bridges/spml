@@ -1,0 +1,85 @@
+server port env PORT
+
+database connect env MONGODB_URI
+
+middleware cors
+middleware logs
+
+route POST /register
+  take name, email, password
+  require name, email, password
+  validate email is email
+  exists user where email
+  if exists return error "Email already in use" status 409
+  hash password
+  create user with name, email, password
+  return token
+
+route POST /login
+  take email, password
+  require email, password
+  find user where email
+  if not user return error "User not found" status 404
+  validate password is matches
+  if not valid return error "Invalid credentials" status 401
+  return token
+
+route GET /me
+  auth required
+  return current user
+
+route GET /products
+  paginate product limit 20
+  return products
+
+route POST /products
+  auth required
+  take name, price, description
+  require name, price
+  create product with name, price, description
+  return product
+
+route GET /products/:id
+  find product by id
+  if not found return error "Product not found" status 404
+  return product
+
+route PUT /products/:id
+  auth required
+  take name, price, description
+  update product with name, price, description
+  return ok
+
+route DELETE /products/:id
+  auth required
+  delete product by id
+  return ok
+
+route GET /orders
+  auth required
+  paginate order limit 20
+  return orders
+
+route POST /orders
+  auth required
+  take productId, quantity
+  require productId, quantity
+  create order with productId, quantity
+  return order
+
+route GET /orders/:id
+  auth required
+  find order by id
+  if not found return error "Order not found" status 404
+  return order
+
+route PUT /orders/:id
+  auth required
+  take productId, quantity
+  update order with productId, quantity
+  return ok
+
+route DELETE /orders/:id
+  auth required
+  delete order by id
+  return ok

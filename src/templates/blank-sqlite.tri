@@ -1,0 +1,9 @@
+server port env PORT
+
+database type sqlite
+
+middleware cors
+middleware logs
+
+route GET /health
+  return ok

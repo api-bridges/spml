@@ -1,0 +1,33 @@
+server port env PORT
+
+database type postgres
+database connect env DATABASE_URL
+
+middleware cors
+middleware logs
+
+route POST /register
+  take name, email, password
+  require name, email, password
+  validate email is email
+  exists user where email
+  if exists return error "Email already in use" status 409
+  hash password
+  create user with name, email, password
+  return token
+
+route POST /login
+  take email, password
+  require email, password
+  find user where email
+  if not user return error "User not found" status 404
+  validate password is matches
+  if not valid return error "Invalid credentials" status 401
+  return token
+
+route GET /me
+  auth required
+  return current user
+
+route GET /health
+  return ok
