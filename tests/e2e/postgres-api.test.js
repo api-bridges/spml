@@ -7,7 +7,6 @@ import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
 import { readFileSync, mkdirSync, writeFileSync, rmSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { compile } from '../../src/cli/index.js';
 import { compileAst } from '../../src/cli/index.js';
 import { resolveImports } from '../../src/compiler/resolve.js';
 import { tokenize } from '../../src/lexer/lexer.js';

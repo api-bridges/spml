@@ -2,7 +2,7 @@
 // End-to-end test: compiles examples/blog-api.tri and verifies the complete
 // CRUD lifecycle is present in the generated Node.js output.
 
-import { describe, it, expect, beforeAll } from '@jest/globals';
+import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
 import { readFileSync, mkdirSync, writeFileSync, rmSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -21,6 +21,10 @@ describe('blog-api.tri — end-to-end compilation', () => {
     output = compile(source);
     // Write to temp dir to verify file I/O as part of the pipeline
     writeFileSync(join(TMP_DIR, 'blog-api.js'), output, 'utf8');
+  });
+
+  afterAll(() => {
+    rmSync(TMP_DIR, { recursive: true, force: true });
   });
 
   // ── Compilation succeeds ───────────────────────────────────────────────────
@@ -210,11 +214,5 @@ describe('blog-api.tri — end-to-end compilation', () => {
 
   it('delete post route calls findByIdAndDelete', () => {
     expect(output).toContain('findByIdAndDelete');
-  });
-
-  // ── Teardown ───────────────────────────────────────────────────────────────
-
-  afterAll(() => {
-    rmSync(TMP_DIR, { recursive: true, force: true });
   });
 });

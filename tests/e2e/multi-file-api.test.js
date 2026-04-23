@@ -4,14 +4,13 @@
 // and present in the generated output.
 
 import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
-import { mkdirSync, writeFileSync, rmSync, existsSync } from 'fs';
+import { mkdirSync, writeFileSync, rmSync, existsSync, readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { compileAst } from '../../src/cli/index.js';
 import { resolveImports } from '../../src/compiler/resolve.js';
 import { tokenize } from '../../src/lexer/lexer.js';
 import { parse } from '../../src/parser/parser.js';
-import { readFileSync } from 'fs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const MULTI_FILE_DIR = join(__dirname, '../../examples/multi-file-api');
