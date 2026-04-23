@@ -10,6 +10,12 @@ import { TOKEN_TYPES } from './tokens.js';
 import { KEYWORDS } from './keywords.js';
 import { TOKEN_PATTERNS } from './patterns.js';
 import { TrinaryError } from '../errors/TrinaryError.js';
+import { applyKeywords } from '../plugin/index.js';
+
+// Apply any plugin-registered keywords to the KEYWORDS set once at module load.
+// When plugins are loaded after the lexer module (e.g. via config.js), callers
+// should invoke applyKeywords(KEYWORDS) themselves before calling tokenize().
+applyKeywords(KEYWORDS);
 
 // Maps the text of a type keyword to its dedicated token type.
 const FIELD_TYPE_TOKENS = new Map([

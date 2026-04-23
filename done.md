@@ -36,3 +36,4 @@
 - Step 32 ✅ socket keyword implemented; WebSocket routes compile to ws package handlers attached to the HTTP server.
 - Step 33 ✅ job keyword implemented; schedule shorthands convert to cron expressions; node-cron code emitted.
 - Step 34 ✅ Built-in test DSL implemented; test blocks compile to Jest/supertest; trionary test CLI command added.
+- Step 35 ✅ Plugin API implemented; keywords, AST nodes, and emitters can be registered at runtime via trionary.config.js.
