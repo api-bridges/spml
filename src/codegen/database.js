@@ -5,13 +5,15 @@
 /**
  * Generate Mongoose database connection code from a DatabaseDeclarationNode.
  *
- * @param {{ type: 'DatabaseDeclaration', uri: string }} node
+ * @param {{ type: 'DatabaseDeclaration', uri: string|null, envVar: string|null }} node
  * @returns {string} Node.js source code string.
  */
 export function generateDatabase(node) {
-  const uri = node.uri;
+  const connArg = node.envVar
+    ? `process.env.${node.envVar}`
+    : `'${node.uri}'`;
   return [
-    `mongoose.connect('${uri}', {`,
+    `mongoose.connect(${connArg}, {`,
     `  useNewUrlParser: true,`,
     `  useUnifiedTopology: true,`,
     `});`,

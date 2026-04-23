@@ -1,8 +1,22 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
+exports[`generateEnvExample() matches snapshot 1`] = `
+"PORT=
+MONGODB_URI=
+"
+`;
+
 exports[`generateServer() matches snapshot 1`] = `
 "const app = express();
 const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(\`Server running on port \${PORT}\`);
+});"
+`;
+
+exports[`generateServer() matches snapshot with envVar 1`] = `
+"const app = express();
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(\`Server running on port \${PORT}\`);
 });"

@@ -210,6 +210,50 @@ Every time you save `app.tri`, Trionary rebuilds and restarts the server automat
 
 ---
 
+## Environment configuration
+
+Trionary source files can reference environment variables for the server port
+and database URL so that the same `.tri` file runs unmodified across
+development, staging, and production.
+
+Use the `env` keyword in place of a literal value:
+
+```tri
+server port env PORT
+
+database connect env MONGODB_URI
+```
+
+When Trionary compiles this file it emits:
+
+```js
+const PORT = process.env.PORT || 3000;
+// …
+mongoose.connect(process.env.MONGODB_URI, { … });
+```
+
+A `.env.example` file is also written alongside the compiled output so that
+every variable name is documented:
+
+```
+PORT=
+MONGODB_URI=
+```
+
+Copy `.env.example` to `.env` and fill in the values before running the server:
+
+```bash
+cp .env.example .env
+# Edit .env and set PORT and MONGODB_URI
+node app.js
+```
+
+> **Tip:** Both literal values (`server port 3000`) and env-var references
+> (`server port env PORT`) are valid. Mix them freely — only the declarations
+> that use `env` will appear in `.env.example`.
+
+---
+
 ## Next steps
 
 - Browse the full [Keyword Reference](KEYWORDS.md)

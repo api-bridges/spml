@@ -156,18 +156,30 @@ class Parser {
   }
 
   // server port <number>
+  // server port env <VAR_NAME>
   parseServerDeclaration() {
     this.expect(TOKEN_TYPES.KEYWORD, 'server');
     this.expect(TOKEN_TYPES.KEYWORD, 'port');
+    if (this.match(TOKEN_TYPES.ENV)) {
+      const varToken = this.expect(TOKEN_TYPES.IDENTIFIER);
+      this.consumeNewline();
+      return ServerDeclarationNode(null, varToken.value);
+    }
     const portToken = this.expect(TOKEN_TYPES.NUMBER);
     this.consumeNewline();
     return ServerDeclarationNode(parseNumber(portToken));
   }
 
   // database connect "<uri>"
+  // database connect env <VAR_NAME>
   parseDatabaseDeclaration() {
     this.expect(TOKEN_TYPES.KEYWORD, 'database');
     this.expect(TOKEN_TYPES.KEYWORD, 'connect');
+    if (this.match(TOKEN_TYPES.ENV)) {
+      const varToken = this.expect(TOKEN_TYPES.IDENTIFIER);
+      this.consumeNewline();
+      return DatabaseDeclarationNode(null, varToken.value);
+    }
     const uriToken = this.expect(TOKEN_TYPES.STRING);
     this.consumeNewline();
     return DatabaseDeclarationNode(uriToken.value);

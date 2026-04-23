@@ -20,8 +20,24 @@ describe('generateDatabase()', () => {
     expect(output).toContain("'mongodb://localhost/myapp'");
   });
 
+  it('emits process.env reference when envVar is set', () => {
+    const output = generateDatabase({ type: 'DatabaseDeclaration', uri: null, envVar: 'MONGODB_URI' });
+    expect(output).toContain('process.env.MONGODB_URI');
+  });
+
+  it('does not embed a literal URI when envVar is set', () => {
+    const output = generateDatabase({ type: 'DatabaseDeclaration', uri: null, envVar: 'MONGODB_URI' });
+    expect(output).not.toContain("'undefined'");
+    expect(output).not.toContain("'null'");
+  });
+
   it('matches snapshot', () => {
     const output = generateDatabase({ type: 'DatabaseDeclaration', uri: 'mongodb://localhost/myapp' });
+    expect(output).toMatchSnapshot();
+  });
+
+  it('matches snapshot with envVar', () => {
+    const output = generateDatabase({ type: 'DatabaseDeclaration', uri: null, envVar: 'MONGODB_URI' });
     expect(output).toMatchSnapshot();
   });
 });
