@@ -235,7 +235,7 @@ export function generateAuthStatements(statementsArray) {
         break;
 
       case 'Validate':
-        if (node.rule === 'matches') {
+        if (node.rule === 'matches' || node.rule === 'is matches') {
           lines.push(generatePasswordMatches());
         } else {
           lines.push(generateValidate(node));

@@ -1,1 +1,1 @@
-npx jest --onlyChanged
+node --experimental-vm-modules node_modules/.bin/jest --onlyChanged
