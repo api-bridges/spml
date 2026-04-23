@@ -28,3 +28,4 @@
 - Step 24 ✅ Four new validation rules added: is number, min/max length, is url, is one of.
 - Step 25 ✅ env keyword implemented; server port and database URL can reference process.env variables; .env.example auto-generated.
 - Step 26 ✅ Custom middleware keyword implemented; npm package names declared in .tri are emitted as app.use() and added to generated package.json.
+- Step 27 ✅ Multi-database codegen implemented; database type postgres emits Prisma client calls and schema.prisma.

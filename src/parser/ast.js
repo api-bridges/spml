@@ -3,8 +3,12 @@
 // Each factory returns a plain object with a `type` string and the node's fields.
 // No classes are used — plain objects keep the AST serialisable and easy to inspect.
 
-export function ProgramNode(body) {
-  return { type: 'Program', body };
+export function ProgramNode(body, dbType = 'mongodb') {
+  return { type: 'Program', body, dbType };
+}
+
+export function DatabaseTypeDeclarationNode(dbType) {
+  return { type: 'DatabaseTypeDeclaration', dbType };
 }
 
 export function ServerDeclarationNode(port, envVar = null) {

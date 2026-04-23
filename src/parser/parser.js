@@ -12,6 +12,7 @@ import {
   ProgramNode,
   ServerDeclarationNode,
   DatabaseDeclarationNode,
+  DatabaseTypeDeclarationNode,
   MiddlewareDeclarationNode,
   MiddlewareNode,
   RouteNode,
@@ -132,12 +133,18 @@ class Parser {
 
   parseProgram() {
     const body = [];
+    let dbType = 'mongodb';
     this.skipNewlines();
     while (!this.check(TOKEN_TYPES.EOF)) {
-      body.push(this.parseTopLevel());
+      const node = this.parseTopLevel();
+      if (node.type === 'DatabaseTypeDeclaration') {
+        dbType = node.dbType;
+      } else {
+        body.push(node);
+      }
       this.skipNewlines();
     }
-    return ProgramNode(body);
+    return ProgramNode(body, dbType);
   }
 
   parseTopLevel() {
@@ -173,8 +180,24 @@ class Parser {
 
   // database connect "<uri>"
   // database connect env <VAR_NAME>
+  // database type mongodb
+  // database type postgres
   parseDatabaseDeclaration() {
     this.expect(TOKEN_TYPES.KEYWORD, 'database');
+    // Peek at the next keyword to decide which form this is
+    const subToken = this.peek();
+    if (subToken.type === TOKEN_TYPES.KEYWORD && subToken.value === 'type') {
+      this.advance(); // consume 'type'
+      const dbTypeToken = this.expect(TOKEN_TYPES.KEYWORD);
+      if (dbTypeToken.value !== 'mongodb' && dbTypeToken.value !== 'postgres') {
+        throw new TrinaryError(
+          `Unknown database type '${dbTypeToken.value}'. Expected 'mongodb' or 'postgres'.`,
+          { line: dbTypeToken.line, col: dbTypeToken.col, source: 'parser' },
+        );
+      }
+      this.consumeNewline();
+      return DatabaseTypeDeclarationNode(dbTypeToken.value);
+    }
     this.expect(TOKEN_TYPES.KEYWORD, 'connect');
     if (this.match(TOKEN_TYPES.ENV)) {
       const varToken = this.expect(TOKEN_TYPES.IDENTIFIER);
