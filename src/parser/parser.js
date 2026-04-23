@@ -292,25 +292,53 @@ class Parser {
     return RequireNode(fields);
   }
 
-  // validate <field> is <rule> [<value>]
+  // validate <field> is email
+  // validate <field> is number
+  // validate <field> is url
+  // validate <field> is one of "<v1>", "<v2>", …
+  // validate <field> min length <n>
+  // validate <field> min length <n> max length <m>
   parseValidate() {
     this.expect(TOKEN_TYPES.KEYWORD, 'validate');
     const fieldToken = this.expectIdentifierOrKeyword();
-    this.expect(TOKEN_TYPES.KEYWORD, 'is');
-    const ruleToken = this.expectIdentifierOrKeyword();
-    let value = null;
-    if (!this.isLineEnd()) {
-      const t = this.peek();
-      if (t.type === TOKEN_TYPES.NUMBER) {
-        value = parseNumber(this.advance());
-      } else if (t.type === TOKEN_TYPES.STRING) {
-        value = this.advance().value;
-      } else if (t.type === TOKEN_TYPES.IDENTIFIER || t.type === TOKEN_TYPES.KEYWORD) {
-        value = this.advance().value;
+
+    if (this.match(TOKEN_TYPES.KEYWORD, 'is')) {
+      const ruleToken = this.expectIdentifierOrKeyword();
+      if (ruleToken.value === 'one') {
+        // is one of "<v1>", "<v2>", …
+        this.expect(TOKEN_TYPES.KEYWORD, 'of');
+        const values = [this.expect(TOKEN_TYPES.STRING).value];
+        while (this.match(TOKEN_TYPES.OPERATOR, ',')) {
+          values.push(this.expect(TOKEN_TYPES.STRING).value);
+        }
+        this.consumeNewline();
+        return ValidateNode(fieldToken.value, 'is one of', values);
       }
+      // is email | is number | is url
+      this.consumeNewline();
+      return ValidateNode(fieldToken.value, `is ${ruleToken.value}`, null);
     }
-    this.consumeNewline();
-    return ValidateNode(fieldToken.value, ruleToken.value, value);
+
+    if (this.match(TOKEN_TYPES.KEYWORD, 'min')) {
+      // min length <n> [max length <m>]
+      this.expect(TOKEN_TYPES.KEYWORD, 'length');
+      const minVal = parseNumber(this.expect(TOKEN_TYPES.NUMBER));
+      if (!this.isLineEnd() && this.check(TOKEN_TYPES.KEYWORD, 'max')) {
+        this.advance(); // consume 'max'
+        this.expect(TOKEN_TYPES.KEYWORD, 'length');
+        const maxVal = parseNumber(this.expect(TOKEN_TYPES.NUMBER));
+        this.consumeNewline();
+        return ValidateNode(fieldToken.value, 'min max length', { min: minVal, max: maxVal });
+      }
+      this.consumeNewline();
+      return ValidateNode(fieldToken.value, 'min length', minVal);
+    }
+
+    const t = this.peek();
+    throw new TrinaryError(
+      `Unexpected validate rule token: ${t.type}(${t.value}). Expected 'is' or 'min'.`,
+      { line: t.line, col: t.col, source: 'parser' },
+    );
   }
 
   // find [all] <model> [sorted by <field>] [where <field> [<value>]]
