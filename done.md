@@ -39,3 +39,4 @@
 - Step 35 ✅ Plugin API implemented; keywords, AST nodes, and emitters can be registered at runtime via trionary.config.js.
 - Step 36 ✅ SQLite database target added; database type sqlite emits Prisma schema with sqlite provider and file:./dev.db URL.
 - Step 37 ✅ Automated semantic-release pipeline configured; CHANGELOG.md auto-generated; Conventional Commits enforced.
+- Step 38 ✅ E2E test suite added covering blog API lifecycle; CI coverage gate set at ≥90%.

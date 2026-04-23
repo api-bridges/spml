@@ -2,6 +2,8 @@
 
 [![npm version](https://img.shields.io/npm/v/trionary.svg)](https://www.npmjs.com/package/trionary)
 [![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
+[![Coverage: ≥90%](https://img.shields.io/badge/coverage-%E2%89%A590%25-brightgreen)](https://github.com/api-bridges/spml/actions/workflows/ci.yml)
+[![CI](https://github.com/api-bridges/spml/actions/workflows/ci.yml/badge.svg)](https://github.com/api-bridges/spml/actions/workflows/ci.yml)
 
 A plain-English backend language that compiles to production-ready Node.js.
 

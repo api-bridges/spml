@@ -53,7 +53,7 @@ function isAuthRoute(body) {
       n.type === 'ExistsCheck' ||
       (n.type === 'Return' && n.value === 'token') ||
       (n.type === 'Return' && n.value === 'current user') ||
-      (n.type === 'Validate' && n.rule === 'matches'),
+      (n.type === 'Validate' && (n.rule === 'matches' || n.rule === 'is matches')),
   );
 }
 
