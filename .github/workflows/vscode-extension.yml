@@ -1,0 +1,43 @@
+name: Build VS Code Extension
+
+on:
+  push:
+    paths:
+      - 'packages/vscode-trionary/**'
+  pull_request:
+    paths:
+      - 'packages/vscode-trionary/**'
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    name: Package .vsix
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/vscode-trionary
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: packages/vscode-trionary/package-lock.json
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Package extension
+        run: npm run vsce:package -- --no-dependencies
+
+      - name: Upload .vsix artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vscode-trionary-vsix
+          path: packages/vscode-trionary/*.vsix
+          retention-days: 30

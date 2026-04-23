@@ -1,0 +1,114 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Trionary",
+  "scopeName": "source.trionary",
+  "fileTypes": ["tri"],
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#escape-hatch" },
+    { "include": "#route-declaration" },
+    { "include": "#http-verbs" },
+    { "include": "#control-keywords" },
+    { "include": "#type-keywords" },
+    { "include": "#value-keywords" },
+    { "include": "#strings" },
+    { "include": "#numbers" },
+    { "include": "#booleans" },
+    { "include": "#route-path" },
+    { "include": "#identifiers" }
+  ],
+  "repository": {
+    "comments": {
+      "name": "comment.line.number-sign.trionary",
+      "match": "#.*$"
+    },
+
+    "escape-hatch": {
+      "name": "meta.embedded.block.js.trionary",
+      "begin": "\\bjs:",
+      "end": "$",
+      "beginCaptures": {
+        "0": { "name": "keyword.other.escape-hatch.trionary" }
+      },
+      "contentName": "source.js"
+    },
+
+    "route-declaration": {
+      "comment": "route GET /path",
+      "match": "\\b(route)\\s+(GET|POST|PUT|PATCH|DELETE)\\s+(/[^\\s]*)",
+      "captures": {
+        "1": { "name": "keyword.control.route.trionary" },
+        "2": { "name": "keyword.operator.http-verb.trionary" },
+        "3": { "name": "string.other.route-path.trionary" }
+      }
+    },
+
+    "http-verbs": {
+      "name": "keyword.operator.http-verb.trionary",
+      "match": "\\b(GET|POST|PUT|PATCH|DELETE)\\b"
+    },
+
+    "control-keywords": {
+      "name": "keyword.control.trionary",
+      "match": "\\b(route|auth|validate|find|create|update|delete|return|populate|middleware|take|require|paginate|check|if|by|sorted|with|where|for|hash|exists|error|status|ok|matches|not|found|one|of|model|import)\\b"
+    },
+
+    "type-keywords": {
+      "name": "support.type.trionary",
+      "match": "\\b(String|Number|Boolean|Date)\\b"
+    },
+
+    "value-keywords": {
+      "name": "keyword.other.trionary",
+      "match": "\\b(server|port|database|connect|current|user|token|password|min|max|per|minute|is|email|length|limit|url|env|type|mongodb|postgres|ref|number|all|js)\\b"
+    },
+
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.trionary",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.trionary",
+              "match": "\\\\."
+            }
+          ]
+        },
+        {
+          "name": "string.quoted.single.trionary",
+          "begin": "'",
+          "end": "'",
+          "patterns": [
+            {
+              "name": "constant.character.escape.trionary",
+              "match": "\\\\."
+            }
+          ]
+        }
+      ]
+    },
+
+    "numbers": {
+      "name": "constant.numeric.trionary",
+      "match": "\\b[0-9]+(\\.[0-9]+)?\\b"
+    },
+
+    "booleans": {
+      "name": "constant.language.boolean.trionary",
+      "match": "\\b(true|false)\\b"
+    },
+
+    "route-path": {
+      "comment": "Standalone route paths like /users/:id",
+      "name": "string.other.route-path.trionary",
+      "match": "(?<![\"'/a-zA-Z0-9_])(/[a-zA-Z0-9_/:\\-]*)(?![\"'])"
+    },
+
+    "identifiers": {
+      "name": "variable.other.trionary",
+      "match": "\\b[a-zA-Z_][a-zA-Z0-9_]*\\b"
+    }
+  }
+}

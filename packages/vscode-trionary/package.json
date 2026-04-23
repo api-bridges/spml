@@ -1,0 +1,55 @@
+{
+  "name": "vscode-trionary",
+  "displayName": "Trionary",
+  "description": "Syntax highlighting for .tri (Trionary) files",
+  "version": "0.1.0",
+  "publisher": "trionary",
+  "license": "ISC",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "keywords": [
+    "trionary",
+    "tri",
+    "backend",
+    "dsl"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/api-bridges/spml"
+  },
+  "activationEvents": [],
+  "main": "./extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "trionary",
+        "aliases": [
+          "Trionary",
+          "tri"
+        ],
+        "extensions": [
+          ".tri"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "trionary",
+        "scopeName": "source.trionary",
+        "path": "./syntaxes/trionary.tmLanguage.json"
+      }
+    ]
+  },
+  "scripts": {
+    "vsce:package": "vsce package",
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "@vscode/vsce": "^3.0.0"
+  }
+}
