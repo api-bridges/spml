@@ -110,3 +110,7 @@ export function SocketNode(path, event, body) {
 export function BroadcastNode(data) {
   return { type: 'Broadcast', data };
 }
+
+export function JobNode(schedule, body) {
+  return { type: 'Job', schedule, body };
+}

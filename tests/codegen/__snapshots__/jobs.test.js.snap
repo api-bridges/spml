@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`generateJob() matches snapshot for daily at midnight 1`] = `
+"cron.schedule('0 0 * * *', async () => {
+  // scheduled task body
+});"
+`;
+
+exports[`generateJob() matches snapshot for every 5 minutes 1`] = `
+"cron.schedule('*/5 * * * *', async () => {
+  // scheduled task body
+});"
+`;

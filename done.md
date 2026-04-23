@@ -34,3 +34,4 @@
 - Step 30 ✅ import routes from keyword implemented; multi-file Trionary projects supported; circular imports detected and reported.
 - Step 31 ✅ stream events keyword implemented; SSE route skeleton emitted with correct headers.
 - Step 32 ✅ socket keyword implemented; WebSocket routes compile to ws package handlers attached to the HTTP server.
+- Step 33 ✅ job keyword implemented; schedule shorthands convert to cron expressions; node-cron code emitted.

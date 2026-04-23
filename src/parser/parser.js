@@ -36,6 +36,7 @@ import {
   StreamNode,
   SocketNode,
   BroadcastNode,
+  JobNode,
 } from './ast.js';
 
 // Token types that represent explicit scalar field types
@@ -160,6 +161,7 @@ class Parser {
         case 'middleware': return this.parseMiddlewareDeclaration();
         case 'route':      return this.parseRoute();
         case 'socket':     return this.parseSocket();
+        case 'job':        return this.parseJob();
       }
     }
     if (t.type === TOKEN_TYPES.IMPORT) {
@@ -167,7 +169,7 @@ class Parser {
     }
     throw new TrinaryError(interpolate(MESSAGES.UNEXPECTED_TOP_LEVEL, { token: `${t.type}(${t.value})` }), {
       line: t.line, col: t.col, source: 'parser',
-      hint: 'Valid top-level keywords are: server, database, middleware, route, import, socket.',
+      hint: 'Valid top-level keywords are: server, database, middleware, route, import, socket, job.',
     });
   }
 
@@ -598,6 +600,64 @@ class Parser {
     }
 
     return SocketNode(pathParts.join(''), event, body);
+  }
+
+  // job daily at midnight
+  // job daily at noon
+  // job weekly
+  // job every <n> minutes|hours|seconds
+  //   <block>
+  parseJob() {
+    this.expect(TOKEN_TYPES.KEYWORD, 'job');
+
+    let schedule;
+
+    if (this.match(TOKEN_TYPES.KEYWORD, 'daily')) {
+      if (this.match(TOKEN_TYPES.KEYWORD, 'at')) {
+        if (this.match(TOKEN_TYPES.KEYWORD, 'midnight')) {
+          schedule = '0 0 * * *';
+        } else if (this.match(TOKEN_TYPES.KEYWORD, 'noon')) {
+          schedule = '0 12 * * *';
+        } else {
+          const t = this.peek();
+          throw new TrinaryError(
+            `Expected 'midnight' or 'noon' after 'daily at' but got ${t.type}(${t.value})`,
+            { line: t.line, col: t.col, source: 'parser' },
+          );
+        }
+      } else {
+        schedule = '0 0 * * *';
+      }
+    } else if (this.match(TOKEN_TYPES.KEYWORD, 'weekly')) {
+      schedule = '0 0 * * 0';
+    } else if (this.match(TOKEN_TYPES.KEYWORD, 'every')) {
+      const nToken = this.expect(TOKEN_TYPES.NUMBER);
+      const n = parseNumber(nToken);
+      const unitToken = this.expectIdentifierOrKeyword();
+      const unit = unitToken.value;
+      if (unit === 'minutes' || unit === 'minute') {
+        schedule = `*/${n} * * * *`;
+      } else if (unit === 'hours' || unit === 'hour') {
+        schedule = `0 */${n} * * *`;
+      } else if (unit === 'seconds' || unit === 'second') {
+        schedule = `*/${n} * * * * *`;
+      } else {
+        throw new TrinaryError(
+          `Unknown schedule unit '${unit}'. Expected 'minutes', 'hours', or 'seconds'.`,
+          { line: unitToken.line, col: unitToken.col, source: 'parser' },
+        );
+      }
+    } else {
+      const t = this.peek();
+      throw new TrinaryError(
+        `Unexpected job schedule token: ${t.type}(${t.value}). Expected 'daily', 'weekly', or 'every'.`,
+        { line: t.line, col: t.col, source: 'parser' },
+      );
+    }
+
+    this.consumeNewline();
+    const body = this.parseBlock();
+    return JobNode(schedule, body);
   }
 
   // broadcast <data>

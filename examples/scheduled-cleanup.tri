@@ -1,0 +1,21 @@
+server port 3000
+
+database connect "mongodb://localhost/myapp"
+
+middleware cors
+middleware logs
+
+# Delete expired sessions every day at midnight
+job daily at midnight
+  delete Session by expiredAt
+
+# Send digest email every week
+job weekly
+  find all User
+
+# Purge temp files every 30 minutes
+job every 30 minutes
+  delete TempFile by createdAt
+
+route GET /health
+  return ok
