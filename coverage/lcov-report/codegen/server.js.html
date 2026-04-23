@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for lexer/tokens.js</title>
+    <title>Code coverage report for codegen/server.js</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../prettify.css" />
     <link rel="stylesheet" href="../base.css" />
@@ -19,34 +19,34 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../index.html">All files</a> / <a href="index.html">lexer</a> tokens.js</h1>
+        <h1><a href="../index.html">All files</a> / <a href="index.html">codegen</a> server.js</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>1/1</span>
+                <span class='fraction'>5/5</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/0</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/0</span>
+                <span class='fraction'>3/3</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>1/1</span>
+                <span class='fraction'>4/4</span>
             </div>
         
             
@@ -91,8 +91,24 @@
 <a name='L26'></a><a href='#L26'>26</a>
 <a name='L27'></a><a href='#L27'>27</a>
 <a name='L28'></a><a href='#L28'>28</a>
-<a name='L29'></a><a href='#L29'>29</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">7x</span>
@@ -112,41 +128,43 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// tokens.js
-// Defines every token type the Trionary lexer can produce.
-// TOKEN_TYPES is frozen so callers cannot accidentally mutate it.
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// server.js
+// Generates the Node.js boilerplate for Express server startup from a ServerDeclarationNode.
+// Returns a string of Node.js code; no file I/O is performed here.
 &nbsp;
-export const TOKEN_TYPES = Object.freeze({
-  KEYWORD: 'KEYWORD',
-  IDENTIFIER: 'IDENTIFIER',
-  STRING: 'STRING',
-  NUMBER: 'NUMBER',
-  OPERATOR: 'OPERATOR',
-  INDENT: 'INDENT',
-  DEDENT: 'DEDENT',
-  NEWLINE: 'NEWLINE',
-  EOF: 'EOF',
-  COMMENT: 'COMMENT',
-  TYPE_STRING: 'TYPE_STRING',
-  TYPE_NUMBER: 'TYPE_NUMBER',
-  TYPE_BOOLEAN: 'TYPE_BOOLEAN',
-  TYPE_DATE: 'TYPE_DATE',
-  IS_NUMBER: 'IS_NUMBER',
-  IS_URL: 'IS_URL',
-  MAX_LENGTH: 'MAX_LENGTH',
-  IS_ONE_OF: 'IS_ONE_OF',
-  ENV: 'ENV',
-  IMPORT: 'IMPORT',
-  ROUTES: 'ROUTES',
-  FROM: 'FROM',
-});
+/**
+ * Generate Express server startup code from a ServerDeclarationNode.
+ *
+ * @param {{ type: 'ServerDeclaration', port: number|null, envVar: string|null }} node
+ * @returns {string} Node.js source code string.
+ */
+export function generateServer(node) {
+  const portExpr = node.envVar
+    ? `process.env.${node.envVar} || 3000`
+    : node.port;
+  return [
+    `const app = express();`,
+    `const PORT = ${portExpr};`,
+    `app.listen(PORT, () =&gt; {`,
+    `  console.log(\`Server running on port \${PORT}\`);`,
+    `});`,
+  ].join('\n');
+}
+&nbsp;
+/**
+ * Generate the contents of a `.env.example` file from a list of environment
+ * variable names referenced by the compiled source.
+ *
+ * @param {string[]} vars - Variable names to include in the example file.
+ * @returns {string} The text content of the `.env.example` file.
+ */
+export function generateEnvExample(vars) {
+  const lines = vars.map((v) =&gt; `${v}=`);
+  return lines.join('\n') + '\n';
+}
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->

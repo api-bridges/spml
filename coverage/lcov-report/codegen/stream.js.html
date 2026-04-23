@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for lexer/tokens.js</title>
+    <title>Code coverage report for codegen/stream.js</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../prettify.css" />
     <link rel="stylesheet" href="../base.css" />
@@ -19,7 +19,7 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../index.html">All files</a> / <a href="index.html">lexer</a> tokens.js</h1>
+        <h1><a href="../index.html">All files</a> / <a href="index.html">codegen</a> stream.js</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
@@ -39,7 +39,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/0</span>
+                <span class='fraction'>1/1</span>
             </div>
         
             
@@ -90,12 +90,7 @@
 <a name='L25'></a><a href='#L25'>25</a>
 <a name='L26'></a><a href='#L26'>26</a>
 <a name='L27'></a><a href='#L27'>27</a>
-<a name='L28'></a><a href='#L28'>28</a>
-<a name='L29'></a><a href='#L29'>29</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">7x</span>
+<a name='L28'></a><a href='#L28'>28</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -114,39 +109,41 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// tokens.js
-// Defines every token type the Trionary lexer can produce.
-// TOKEN_TYPES is frozen so callers cannot accidentally mutate it.
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// stream.js
+// Generates Node.js Express code for a StreamNode (Server-Sent Events route).
+// The emitted skeleton sets the required SSE response headers and establishes
+// a keep-alive connection; the developer fills in the event data.
 &nbsp;
-export const TOKEN_TYPES = Object.freeze({
-  KEYWORD: 'KEYWORD',
-  IDENTIFIER: 'IDENTIFIER',
-  STRING: 'STRING',
-  NUMBER: 'NUMBER',
-  OPERATOR: 'OPERATOR',
-  INDENT: 'INDENT',
-  DEDENT: 'DEDENT',
-  NEWLINE: 'NEWLINE',
-  EOF: 'EOF',
-  COMMENT: 'COMMENT',
-  TYPE_STRING: 'TYPE_STRING',
-  TYPE_NUMBER: 'TYPE_NUMBER',
-  TYPE_BOOLEAN: 'TYPE_BOOLEAN',
-  TYPE_DATE: 'TYPE_DATE',
-  IS_NUMBER: 'IS_NUMBER',
-  IS_URL: 'IS_URL',
-  MAX_LENGTH: 'MAX_LENGTH',
-  IS_ONE_OF: 'IS_ONE_OF',
-  ENV: 'ENV',
-  IMPORT: 'IMPORT',
-  ROUTES: 'ROUTES',
-  FROM: 'FROM',
-});
+/**
+ * Generate SSE boilerplate for a StreamNode.
+ *
+ * Trionary: `stream events`
+ * Output:
+ *   res.setHeader('Content-Type', 'text/event-stream');
+ *   res.setHeader('Cache-Control', 'no-cache');
+ *   res.setHeader('Connection', 'keep-alive');
+ *   res.flushHeaders();
+ *   // developer fills in the event data
+ *
+ * @returns {string} Node.js source code string.
+ */
+export function generateStream() {
+  return [
+    `res.setHeader('Content-Type', 'text/event-stream');`,
+    `res.setHeader('Cache-Control', 'no-cache');`,
+    `res.setHeader('Connection', 'keep-alive');`,
+    `res.flushHeaders();`,
+    `// developer fills in the event data`,
+  ].join('\n');
+}
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->

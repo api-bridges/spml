@@ -35,8 +35,10 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: Install VitePress
-        run: npm install --save-dev vitepress
+      - name: Install dependencies
+        run: npm ci
+        env:
+          HUSKY: '0'
 
       - name: Build docs
         run: npx vitepress build docs

@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for errors/TrinaryError.js</title>
+    <title>Code coverage report for cli/config.js</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../prettify.css" />
     <link rel="stylesheet" href="../base.css" />
@@ -19,34 +19,34 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../index.html">All files</a> / <a href="index.html">errors</a> TrinaryError.js</h1>
+        <h1><a href="../index.html">All files</a> / <a href="index.html">cli</a> config.js</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>6/12</span>
+                <span class='fraction'>0/16</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">27.27% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>3/11</span>
+                <span class='fraction'>0/11</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>1/2</span>
+                <span class='fraction'>0/1</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>6/12</span>
+                <span class='fraction'>0/16</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line medium'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -121,7 +121,9 @@
 <a name='L56'></a><a href='#L56'>56</a>
 <a name='L57'></a><a href='#L57'>57</a>
 <a name='L58'></a><a href='#L58'>58</a>
-<a name='L59'></a><a href='#L59'>59</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -133,24 +135,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">17x</span>
-<span class="cline-any cline-yes">17x</span>
-<span class="cline-any cline-yes">17x</span>
-<span class="cline-any cline-yes">17x</span>
-<span class="cline-any cline-yes">17x</span>
-<span class="cline-any cline-yes">17x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -167,7 +151,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -179,63 +164,84 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// TrinaryError.js
-// Custom error class for the Trionary compiler.
-// Wraps raw parser/codegen errors into human-readable, plain-English messages
-// with line numbers, source labels, and optional keyword hints.
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// src/cli/config.js
+// Reads trionary.config.js from the project root (process.cwd()) and loads
+// any declared plugins by calling their register(api) hook.
+//
+// Expected shape of trionary.config.js:
+//
+//   import stripePlugin from './plugins/stripe-webhook.js';
+//   export default {
+//     plugins: [stripePlugin],
+//   };
+&nbsp;
+import { existsSync } from 'fs';
+import { resolve } from 'path';
+import { pathToFileURL } from 'url';
+import { pluginAPI, applyKeywords } from '../plugin/index.js';
+import { KEYWORDS } from '../lexer/keywords.js';
 &nbsp;
 /**
- * TrinaryError — structured compiler error for the Trionary language.
+ * Load trionary.config.js from the given root directory (defaults to cwd).
+ * For each plugin listed in config.plugins, calls plugin.register(pluginAPI).
+ * After all plugins have been registered, re-applies keywords to the live KEYWORDS set.
  *
- * @property {string}      message  - Plain-English description of the problem.
- * @property {number|null} line     - Source line where the error occurred.
- * @property {number|null} col      - Source column where the error occurred.
- * @property {string}      source   - Stage that produced the error: 'lexer' | 'parser' | 'codegen'.
- * @property {string|null} hint     - Optional hint to help the developer fix the error.
+ * @param {string} [root] - Directory to search for trionary.config.js (defaults to process.cwd()).
+ * @returns {Promise&lt;boolean&gt;} True if a config file was found and loaded, false otherwise.
  */
-export class TrinaryError extends Error {
-  /**
-   * @param {string}      message
-   * @param {object}      [options={}]
-   * @param {number|null} [options.line=null]
-   * @param {number|null} [options.col=null]
-   * @param {string}      [options.source='parser']
-   * @param {string|null} [options.hint=null]
-   */
-  constructor(message, { line = null, col = null, source = <span class="branch-0 cbranch-no" title="branch not covered" >'parser',</span> hint = null } = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
-    super(message);
-    this.name = 'TrinaryError';
-    this.line = line;
-    this.col = col;
-    this.source = source;
-    this.hint = hint;
+export async function <span class="fstat-no" title="function not covered" >loadConfig(</span>root = <span class="branch-0 cbranch-no" title="branch not covered" >process.cwd())</span> {
+  const configPath = <span class="cstat-no" title="statement not covered" >resolve(root, 'trionary.config.js');</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  if (!existsSync(configPath)) {</span>
+<span class="cstat-no" title="statement not covered" >    return false;</span>
   }
 &nbsp;
-  /**
-   * Format the error as a multi-line, human-readable block suitable for stderr.
-   *
-   * Example output:
-   *   [Trionary Error — line 12, col 5]
-   *   Parser: Unexpected token "retun". Did you mean "return"?
-   *   Hint: All return statements must start with the keyword "return".
-   *
-   * @returns {string}
-   */
-<span class="fstat-no" title="function not covered" >  to</span>String() {
-    const location =
-<span class="cstat-no" title="statement not covered" >      this.line != null</span>
-        ? `line ${this.line}${this.col != null ? `, col ${this.col}` : ''}`
-        : 'unknown location';
+  const configUrl = <span class="cstat-no" title="statement not covered" >pathToFileURL(configPath).href;</span>
+  let config;
+<span class="cstat-no" title="statement not covered" >  try {</span>
+    const mod = <span class="cstat-no" title="statement not covered" >await import(configUrl);</span>
+<span class="cstat-no" title="statement not covered" >    config = mod.default ?? mod;</span>
+  } catch (err) {
+<span class="cstat-no" title="statement not covered" >    throw new Error(`Failed to load trionary.config.js: ${err.message}`);</span>
+  }
 &nbsp;
-    const sourceLabel =
-<span class="cstat-no" title="statement not covered" >      this.source.charAt(0).toUpperCase() + this.source.slice(1);</span>
+<span class="cstat-no" title="statement not covered" >  if (!config || !Array.isArray(config.plugins)) {</span>
+    // Config file exists but has no plugins array — that's fine, nothing to load.
+<span class="cstat-no" title="statement not covered" >    return true;</span>
+  }
 &nbsp;
-    let output = <span class="cstat-no" title="statement not covered" >`[Trionary Error — ${location}]\n${sourceLabel}: ${this.message}`;</span>
-<span class="cstat-no" title="statement not covered" >    if (this.hint) {</span>
-<span class="cstat-no" title="statement not covered" >      output += `\nHint: ${this.hint}`;</span>
+<span class="cstat-no" title="statement not covered" >  for (const plugin of config.plugins) {</span>
+<span class="cstat-no" title="statement not covered" >    if (typeof plugin.register !== 'function') {</span>
+<span class="cstat-no" title="statement not covered" >      throw new TypeError(</span>
+        `trionary.config.js: each plugin must export a register(api) function. Got: ${JSON.stringify(plugin)}`,
+      );
     }
-<span class="cstat-no" title="statement not covered" >    return output;</span>
+<span class="cstat-no" title="statement not covered" >    plugin.register(pluginAPI);</span>
   }
+&nbsp;
+  // Re-apply all newly registered keywords to the live lexer KEYWORDS set.
+<span class="cstat-no" title="statement not covered" >  applyKeywords(KEYWORDS);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  return true;</span>
 }
 &nbsp;</pre></td></tr></table></pre>
 
