@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for lexer/keywords.js</title>
+    <title>Code coverage report for parser/ast.js</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../prettify.css" />
     <link rel="stylesheet" href="../base.css" />
@@ -19,34 +19,34 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../index.html">All files</a> / <a href="index.html">lexer</a> keywords.js</h1>
+        <h1><a href="../index.html">All files</a> / <a href="index.html">parser</a> ast.js</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">61.29% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>1/1</span>
+                <span class='fraction'>19/31</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">40% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/0</span>
+                <span class='fraction'>2/5</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">61.29% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/0</span>
+                <span class='fraction'>19/31</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">61.29% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>1/1</span>
+                <span class='fraction'>19/31</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line medium'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -161,202 +161,292 @@
 <a name='L96'></a><a href='#L96'>96</a>
 <a name='L97'></a><a href='#L97'>97</a>
 <a name='L98'></a><a href='#L98'>98</a>
-<a name='L99'></a><a href='#L99'>99</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">54x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">26x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">31x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">22x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// keywords.js
-// Exports the complete set of reserved keywords in the Trionary language.
-// Any identifier whose text matches a member of this Set must be classified
-// as a KEYWORD token rather than an IDENTIFIER token.
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// ast.js
+// Factory functions for every AST node type the Trionary parser produces.
+// Each factory returns a plain object with a `type` string and the node's fields.
+// No classes are used — plain objects keep the AST serialisable and easy to inspect.
 &nbsp;
-export const KEYWORDS = new Set([
-  'server',
-  'port',
-  'database',
-  'connect',
-  'route',
-  'GET',
-  'POST',
-  'PUT',
-  'PATCH',
-  'DELETE',
-  'take',
-  'require',
-  'validate',
-  'exists',
-  'hash',
-  'create',
-  'find',
-  'update',
-  'delete',
-  'return',
-  'auth',
-  'middleware',
-  'cors',
-  'logs',
-  'helmet',
-  'ratelimit',
-  'compress',
-  'paginate',
-  'check',
-  'if',
-  'by',
-  'all',
-  'sorted',
-  'with',
-  'where',
-  'current',
-  'user',
-  'token',
-  'for',
-  'error',
-  'status',
-  'ok',
-  'password',
-  'matches',
-  'not',
-  'found',
-  'min',
-  'max',
-  'per',
-  'minute',
-  'is',
-  'email',
-  'length',
-  'limit',
-  'String',
-  'Number',
-  'Boolean',
-  'Date',
-  'populate',
-  'ref',
-  'number',
-  'url',
-  'one',
-  'of',
-  'env',
-  'type',
-  'mongodb',
-  'postgres',
-  'sqlite',
-  'import',
-  'routes',
-  'from',
-  'stream',
-  'events',
-  'socket',
-  'on',
-  'broadcast',
-  'job',
-  'daily',
-  'weekly',
-  'at',
-  'midnight',
-  'noon',
-  'every',
-  'minutes',
-  'hours',
-  'seconds',
-  'test',
-  'send',
-  'expect',
-  'body',
-]);
+export function ProgramNode(body, dbType = <span class="branch-0 cbranch-no" title="branch not covered" >'mongodb')</span> {
+  return { type: 'Program', body, dbType };
+}
+&nbsp;
+export function <span class="fstat-no" title="function not covered" >DatabaseTypeDeclarationNode(</span>dbType) {
+<span class="cstat-no" title="statement not covered" >  return { type: 'DatabaseTypeDeclaration', dbType };</span>
+}
+&nbsp;
+export function ServerDeclarationNode(port, envVar = null) {
+  return { type: 'ServerDeclaration', port, envVar };
+}
+&nbsp;
+export function DatabaseDeclarationNode(uri, envVar = null) {
+  return { type: 'DatabaseDeclaration', uri, envVar };
+}
+&nbsp;
+export function <span class="fstat-no" title="function not covered" >MiddlewareDeclarationNode(</span>name, options) {
+<span class="cstat-no" title="statement not covered" >  return { type: 'MiddlewareDeclaration', name, options };</span>
+}
+&nbsp;
+export function RouteNode(method, path, body) {
+  return { type: 'Route', method, path, body };
+}
+&nbsp;
+export function AuthNode(required) {
+  return { type: 'Auth', required };
+}
+&nbsp;
+export function TakeNode(fields) {
+  return { type: 'Take', fields };
+}
+&nbsp;
+export function <span class="fstat-no" title="function not covered" >RequireNode(</span>fields) {
+<span class="cstat-no" title="statement not covered" >  return { type: 'Require', fields };</span>
+}
+&nbsp;
+export function ValidateNode(field, rule, value) {
+  return { type: 'Validate', field, rule, value };
+}
+&nbsp;
+export function FindNode(target, filter, options) {
+  return { type: 'Find', target, filter, options };
+}
+&nbsp;
+export function <span class="fstat-no" title="function not covered" >CreateNode(</span>model, fields) {
+<span class="cstat-no" title="statement not covered" >  return { type: 'Create', model, fields };</span>
+}
+&nbsp;
+export function <span class="fstat-no" title="function not covered" >UpdateNode(</span>model, fields) {
+<span class="cstat-no" title="statement not covered" >  return { type: 'Update', model, fields };</span>
+}
+&nbsp;
+export function DeleteNode(model, filter) {
+  return { type: 'Delete', model, filter };
+}
+&nbsp;
+export function ReturnNode(value, statusCode) {
+  return { type: 'Return', value, statusCode };
+}
+&nbsp;
+export function <span class="fstat-no" title="function not covered" >ExistsCheckNode(</span>model, filter) {
+<span class="cstat-no" title="statement not covered" >  return { type: 'ExistsCheck', model, filter };</span>
+}
+&nbsp;
+export function IfNode(condition, body) {
+  return { type: 'If', condition, body };
+}
+&nbsp;
+export function <span class="fstat-no" title="function not covered" >HashNode(</span>field) {
+<span class="cstat-no" title="statement not covered" >  return { type: 'Hash', field };</span>
+}
+&nbsp;
+export function <span class="fstat-no" title="function not covered" >PaginateNode(</span>target, limit) {
+<span class="cstat-no" title="statement not covered" >  return { type: 'Paginate', target, limit };</span>
+}
+&nbsp;
+export function EscapeHatchNode(rawJs, line) {
+  return { type: 'EscapeHatch', rawJs, line };
+}
+&nbsp;
+export function <span class="fstat-no" title="function not covered" >FieldNode(</span>name, fieldType = <span class="branch-0 cbranch-no" title="branch not covered" >'String',</span> ref = <span class="branch-0 cbranch-no" title="branch not covered" >null)</span> {
+<span class="cstat-no" title="statement not covered" >  return { type: 'Field', name, fieldType, ref };</span>
+}
+&nbsp;
+export function <span class="fstat-no" title="function not covered" >PopulateNode(</span>model, field) {
+<span class="cstat-no" title="statement not covered" >  return { type: 'Populate', model, field };</span>
+}
+&nbsp;
+export function <span class="fstat-no" title="function not covered" >MiddlewareNode(</span>packageName) {
+<span class="cstat-no" title="statement not covered" >  return { type: 'Middleware', packageName };</span>
+}
+&nbsp;
+export function ImportNode(path) {
+  return { type: 'Import', path };
+}
+&nbsp;
+export function <span class="fstat-no" title="function not covered" >StreamNode(</span>) {
+<span class="cstat-no" title="statement not covered" >  return { type: 'Stream' };</span>
+}
+&nbsp;
+export function SocketNode(path, event, body) {
+  return { type: 'Socket', path, event, body };
+}
+&nbsp;
+export function BroadcastNode(data) {
+  return { type: 'Broadcast', data };
+}
+&nbsp;
+export function JobNode(schedule, body) {
+  return { type: 'Job', schedule, body };
+}
+&nbsp;
+export function TestNode(description, body) {
+  return { type: 'Test', description, body };
+}
+&nbsp;
+export function SendNode(method, path, fields) {
+  return { type: 'Send', method, path, fields };
+}
+&nbsp;
+export function ExpectNode(expectType, assertion) {
+  return { type: 'Expect', expectType, assertion };
+}
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
