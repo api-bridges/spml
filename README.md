@@ -151,3 +151,11 @@ The indented block is emitted verbatim into the compiled output. A warning comme
 
 A working URL-shortener API written entirely in Trionary is included in [`examples/demo-api/`](examples/demo-api/).
 It demonstrates user auth, CRUD operations, pagination, and rate-limiting — all in under 60 lines of plain-English source.
+
+---
+
+## Contributing
+
+We welcome contributions! Please read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
+
+All commits must follow the [Conventional Commits](https://www.conventionalcommits.org/) specification (`feat:`, `fix:`, `docs:`, `chore:`, `BREAKING CHANGE:`). A commitlint hook enforces this automatically when you run `npm install`.

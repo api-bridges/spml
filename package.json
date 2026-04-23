@@ -11,13 +11,21 @@
     "README.md"
   ],
   "scripts": {
-    "test": "node --experimental-vm-modules node_modules/.bin/jest"
+    "test": "node --experimental-vm-modules node_modules/.bin/jest",
+    "prepare": "husky"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/api-bridges/spml.git"
   },
-  "keywords": ["compiler", "backend", "nodejs", "express", "plain-english", "dsl"],
+  "keywords": [
+    "compiler",
+    "backend",
+    "nodejs",
+    "express",
+    "plain-english",
+    "dsl"
+  ],
   "author": "",
   "license": "ISC",
   "type": "module",
@@ -26,10 +34,19 @@
   },
   "homepage": "https://github.com/api-bridges/spml#readme",
   "devDependencies": {
+    "@commitlint/cli": "^20.5.0",
+    "@commitlint/config-conventional": "^20.5.0",
     "@jest/globals": "^30.3.0",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^13.0.1",
+    "@semantic-release/github": "^12.0.6",
+    "@semantic-release/npm": "^13.1.5",
+    "@semantic-release/release-notes-generator": "^14.1.0",
     "eslint": "^10.2.1",
+    "husky": "^9.1.7",
     "jest": "^30.3.0",
-    "prettier": "^3.8.3"
+    "prettier": "^3.8.3",
+    "semantic-release": "^25.0.3"
   },
   "dependencies": {
     "chokidar": "^5.0.0"
