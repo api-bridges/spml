@@ -32,3 +32,4 @@
 - Step 28 ✅ VS Code syntax highlighting extension created; TextMate grammar covers all Trionary keywords; .vsix packaged.
 - Step 29 ✅ LSP server implemented; autocomplete, inline diagnostics, and hover documentation work in VS Code.
 - Step 30 ✅ import routes from keyword implemented; multi-file Trionary projects supported; circular imports detected and reported.
+- Step 31 ✅ stream events keyword implemented; SSE route skeleton emitted with correct headers.

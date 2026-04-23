@@ -75,4 +75,6 @@ export const KEYWORDS = new Set([
   'import',
   'routes',
   'from',
+  'stream',
+  'events',
 ]);

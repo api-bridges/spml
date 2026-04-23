@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`generateCrudStatements() — Stream node matches snapshot when embedded in a route body 1`] = `
+"res.setHeader('Content-Type', 'text/event-stream');
+res.setHeader('Cache-Control', 'no-cache');
+res.setHeader('Connection', 'keep-alive');
+res.flushHeaders();
+// developer fills in the event data"
+`;
+
+exports[`generateStream() matches snapshot 1`] = `
+"res.setHeader('Content-Type', 'text/event-stream');
+res.setHeader('Cache-Control', 'no-cache');
+res.setHeader('Connection', 'keep-alive');
+res.flushHeaders();
+// developer fills in the event data"
+`;

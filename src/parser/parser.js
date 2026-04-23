@@ -33,6 +33,7 @@ import {
   FieldNode,
   PopulateNode,
   ImportNode,
+  StreamNode,
 } from './ast.js';
 
 // Token types that represent explicit scalar field types
@@ -51,7 +52,7 @@ const BODY_KEYWORDS = new Set([
 
 // Human-readable list of valid statement-level keywords (used in error hints)
 const STATEMENT_KEYWORDS_LIST =
-  'auth, take, require, validate, find, create, update, delete, return, exists, if, hash, paginate, populate';
+  'auth, take, require, validate, find, create, update, delete, return, exists, if, hash, paginate, populate, stream';
 
 // Parse a numeric string, throwing a structured error if the result is NaN.
 function parseNumber(token) {
@@ -294,6 +295,7 @@ class Parser {
         case 'hash':     return this.parseHash();
         case 'paginate': return this.parsePaginate();
         case 'populate': return this.parsePopulate();
+        case 'stream':   return this.parseStream();
       }
     }
     // Escape hatch: `js:` block or legacy `escape` identifier
@@ -547,6 +549,14 @@ class Parser {
     const fieldToken = this.expectIdentifierOrKeyword();
     this.consumeNewline();
     return PopulateNode(modelToken.value, fieldToken.value);
+  }
+
+  // stream events
+  parseStream() {
+    this.expect(TOKEN_TYPES.KEYWORD, 'stream');
+    this.expect(TOKEN_TYPES.KEYWORD, 'events');
+    this.consumeNewline();
+    return StreamNode();
   }
 
   // js:
