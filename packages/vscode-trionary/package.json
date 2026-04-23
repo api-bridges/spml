@@ -2,7 +2,7 @@
   "name": "vscode-trionary",
   "displayName": "Trionary",
   "description": "Syntax highlighting for .tri (Trionary) files",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "publisher": "trionary",
   "license": "ISC",
   "engines": {

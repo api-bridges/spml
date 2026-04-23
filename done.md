@@ -41,3 +41,4 @@
 - Step 37 ✅ Automated semantic-release pipeline configured; CHANGELOG.md auto-generated; Conventional Commits enforced.
 - Step 38 ✅ E2E test suite added covering blog API lifecycle; CI coverage gate set at ≥90%.
 - Step 39 ✅ trionary new interactive project generator implemented; prompts for DB type, auth, and starter routes; scaffolds a ready-to-run project.
+- Step 40 ✅ Trionary v1.0.0 released; npm published, docs site live, VS Code extension on Marketplace, community launch complete.
