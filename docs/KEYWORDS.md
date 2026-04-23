@@ -95,8 +95,13 @@ await Post.findByIdAndUpdate(req.params.id, { $set: updates }, { new: true });
 | `validate` | Apply a format or length rule to a field | `validate email is email` |
 | `is` | Link a field to its validation rule | `validate email is email` |
 | `email` | Validate that a field is a valid email address | `validate email is email` |
+| `number` | Validate that a field is a numeric value | `validate age is number` |
+| `url` | Validate that a field is a valid URL | `validate website is url` |
+| `one` | Part of the `is one of` allowlist rule | `validate role is one of "admin", "user"` |
+| `of` | Part of the `is one of` allowlist rule | `validate role is one of "admin", "user"` |
 | `min` | Set a minimum length threshold | `validate password min length 8` |
-| `length` | Refer to the string length (used with `min`) | `validate password min length 8` |
+| `max` | Set a maximum length threshold | `validate username min length 3 max length 20` |
+| `length` | Refer to the string length (used with `min` / `max`) | `validate password min length 8` |
 | `limit` | Set a page size (used with `paginate`) | `paginate post limit 10` |
 | `exists` | Query whether a record exists | `exists user where email` |
 | `find` | Fetch one or many records from the database | `find post by id` |
@@ -132,3 +137,33 @@ await Post.findByIdAndUpdate(req.params.id, { $set: updates }, { new: true });
 | `if` | Conditionally execute a statement | `if not found return error "Not found" status 404` |
 | `not` | Negate a condition (used with `if`) | `if not valid return error "Invalid" status 401` |
 | `found` | Refers to whether the previous `find` succeeded | `if not found return error "Not found" status 404` |
+
+---
+
+## Validation Rules Reference
+
+The `validate` keyword supports the following rules:
+
+| Syntax | Description | Example |
+|---|---|---|
+| `validate <field> is email` | Reject non-email-format values | `validate email is email` |
+| `validate <field> is number` | Reject non-numeric values | `validate age is number` |
+| `validate <field> is url` | Reject invalid URLs (WHATWG URL check) | `validate website is url` |
+| `validate <field> is one of "<v1>", "<v2>", …` | Reject values not in the allowlist | `validate role is one of "admin", "user"` |
+| `validate <field> min length <n>` | Reject strings shorter than `n` characters | `validate password min length 8` |
+| `validate <field> min length <n> max length <m>` | Reject strings outside the `[n, m]` range | `validate username min length 3 max length 20` |
+
+**Examples:**
+
+```tri
+route POST /register
+  take email, password, username, age, website, role
+  validate email is email
+  validate password min length 8
+  validate username min length 3 max length 20
+  validate age is number
+  validate website is url
+  validate role is one of "admin", "user", "guest"
+  create user with email, password, username, age, website, role
+  return ok
+```

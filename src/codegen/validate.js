@@ -59,6 +59,50 @@ const VALIDATORS = {
     const label = escapeQuotes(capitalise(field));
     return `if (${field}.length < ${n}) return res.status(400).json({ error: '${label} must be at least ${n} characters' });`;
   },
+
+  /**
+   * `validate <field> is number`
+   * Emits a type check that rejects non-numeric values with a 400 response.
+   */
+  number: (node) => {
+    const field = node.field;
+    const label = escapeQuotes(capitalise(field));
+    return `if (typeof ${field} !== 'number' || isNaN(${field})) return res.status(400).json({ error: '${label} must be a number' });`;
+  },
+
+  /**
+   * `validate <field> min length <n> max length <m>`
+   * Emits a length range check that rejects strings outside [n, m] with a 400 response.
+   */
+  minMaxLength: (node) => {
+    const field = node.field;
+    const { min, max } = node.value;
+    const label = escapeQuotes(capitalise(field));
+    return `if (${field}.length < ${min} || ${field}.length > ${max}) return res.status(400).json({ error: '${label} must be between ${min} and ${max} characters' });`;
+  },
+
+  /**
+   * `validate <field> is url`
+   * Emits a URL validity check using the WHATWG URL constructor.
+   */
+  url: (node) => {
+    const field = node.field;
+    const label = escapeQuotes(capitalise(field));
+    return `try { new URL(${field}); } catch (_) { return res.status(400).json({ error: '${label} must be a valid URL' }); }`;
+  },
+
+  /**
+   * `validate <field> is one of "<v1>", "<v2>", …`
+   * Emits an allowlist check that rejects values not in the provided list.
+   */
+  oneOf: (node) => {
+    const field = node.field;
+    const values = node.value;
+    const list = values.map((v) => `'${escapeQuotes(v)}'`).join(', ');
+    const label = escapeQuotes(capitalise(field));
+    const display = escapeQuotes(values.join(', '));
+    return `if (![${list}].includes(${field})) return res.status(400).json({ error: '${label} must be one of: ${display}' });`;
+  },
 };
 
 /**
@@ -73,6 +117,10 @@ function resolveRuleKey(rule) {
   const normalised = String(rule).trim().toLowerCase().replace(/\s+/g, ' ');
   if (normalised === 'is email' || normalised === 'email') return 'email';
   if (normalised === 'min length' || normalised === 'minlength') return 'minLength';
+  if (normalised === 'is number' || normalised === 'number') return 'number';
+  if (normalised === 'min max length' || normalised === 'minmaxlength') return 'minMaxLength';
+  if (normalised === 'is url' || normalised === 'url') return 'url';
+  if (normalised === 'is one of' || normalised === 'oneof') return 'oneOf';
   // Convert kebab/space separated to camelCase for future rules
   return normalised.replace(/[\s-](.)/g, (_, c) => c.toUpperCase());
 }
@@ -81,8 +129,12 @@ function resolveRuleKey(rule) {
  * Generate validation code for a ValidateNode.
  *
  * Supported rules (via the VALIDATORS map):
- *   - `validate <field> is email`       → email format check
- *   - `validate <field> min length <n>` → minimum length check
+ *   - `validate <field> is email`                         → email format check
+ *   - `validate <field> min length <n>`                   → minimum length check
+ *   - `validate <field> is number`                        → numeric type check
+ *   - `validate <field> min length <n> max length <m>`    → length range check
+ *   - `validate <field> is url`                           → URL validity check
+ *   - `validate <field> is one of "<v1>", "<v2>", …`      → allowlist check
  *
  * @param {{ type: 'Validate', field: string, rule: string, value: any }} node
  * @returns {string} Generated Node.js source code.

@@ -25,3 +25,4 @@
 - Step 21 ✅ Explicit field type declarations (String, Number, Boolean, Date) supported; Mongoose schemas now emit correct types.
 - Step 22 ✅ populate keyword and ObjectId ref fields implemented; Mongoose query chains emit .populate() calls correctly.
 - Step 23 ✅ Partial update (PATCH) semantics implemented; update codegen emits $set spread for PATCH routes.
+- Step 24 ✅ Four new validation rules added: is number, min/max length, is url, is one of.

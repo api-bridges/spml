@@ -83,17 +83,16 @@ describe('parse()', () => {
       const source = 'route POST /reg\n  validate email is email';
       const ast = parseSource(source);
       const vNode = ast.body[0].body[0];
-      // validate <field> is <rule> [<value>]
-      // field='email', rule='email' (word after 'is'), value=null (nothing follows)
-      expect(vNode).toMatchObject({ type: 'Validate', field: 'email', rule: 'email', value: null });
+      // validate <field> is <rule> — rule is stored as full 'is email' string
+      expect(vNode).toMatchObject({ type: 'Validate', field: 'email', rule: 'is email', value: null });
     });
 
-    it('parses "validate password is minlength 8" with numeric value', () => {
-      const source = 'route POST /reg\n  validate password is minlength 8';
+    it('parses "validate password min length 8" with numeric value', () => {
+      const source = 'route POST /reg\n  validate password min length 8';
       const ast = parseSource(source);
       const vNode = ast.body[0].body[0];
-      // field='password', rule='minlength', value=8
-      expect(vNode).toMatchObject({ type: 'Validate', field: 'password', rule: 'minlength', value: 8 });
+      // field='password', rule='min length', value=8
+      expect(vNode).toMatchObject({ type: 'Validate', field: 'password', rule: 'min length', value: 8 });
     });
   });
 
