@@ -4,6 +4,8 @@
 [![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
 [![Coverage: ≥90%](https://img.shields.io/badge/coverage-%E2%89%A590%25-brightgreen)](https://github.com/api-bridges/spml/actions/workflows/ci.yml)
 [![CI](https://github.com/api-bridges/spml/actions/workflows/ci.yml/badge.svg)](https://github.com/api-bridges/spml/actions/workflows/ci.yml)
+[![VS Code Marketplace](https://img.shields.io/visual-studio-marketplace/v/trionary.vscode-trionary?label=VS%20Code%20Marketplace)](https://marketplace.visualstudio.com/items?itemName=trionary.vscode-trionary)
+[![Docs](https://img.shields.io/badge/docs-api--bridges.github.io%2Fspml-blue)](https://api-bridges.github.io/spml/)
 
 A plain-English backend language that compiles to production-ready Node.js.
 
@@ -142,9 +144,11 @@ The indented block is emitted verbatim into the compiled output. A warning comme
 
 ## Documentation
 
+- [📖 Docs Site →](https://api-bridges.github.io/spml/)
 - [Keyword Reference →](docs/KEYWORDS.md)
 - [Getting Started Guide →](docs/GETTING_STARTED.md)
 - [Limitations →](docs/LIMITATIONS.md)
+- [Migration: v0 → v1 →](docs/MIGRATION_v0_to_v1.md)
 - [Roadmap →](docs/ROADMAP.md)
 
 ---

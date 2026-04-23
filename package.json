@@ -1,6 +1,6 @@
 {
   "name": "trionary",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "A plain-English backend language that compiles to Node.js",
   "main": "src/cli/index.js",
   "bin": {
