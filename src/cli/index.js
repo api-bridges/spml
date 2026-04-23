@@ -30,6 +30,11 @@ import { resolveImports } from '../compiler/resolve.js';
 import * as mongooseBackend from '../codegen/backends/mongoose.js';
 import * as prismaBackend from '../codegen/backends/prisma.js';
 
+// Plugin registry — emitters contributed by third-party plugins
+import { emitters as pluginEmitters, applyKeywords } from '../plugin/index.js';
+import { KEYWORDS } from '../lexer/keywords.js';
+import { loadConfig } from './config.js';
+
 // ---------------------------------------------------------------------------
 // Compiler — tokenize → parse → codegen
 // ---------------------------------------------------------------------------
@@ -185,8 +190,14 @@ export function compileAst(ast, dbOverride = null) {
         break;
       }
 
-      default:
+      default: {
+        // Fall back to plugin-registered emitters for unknown node types.
+        const pluginEmitter = pluginEmitters.get(node.type);
+        if (pluginEmitter) {
+          routeSection.push(pluginEmitter(node));
+        }
         break;
+      }
     }
   }
 
@@ -516,6 +527,14 @@ function handleError(err) {
 
 async function main() {
   const [, , command, ...args] = process.argv;
+
+  // Load trionary.config.js (if present) so plugins are registered before anything else.
+  try {
+    await loadConfig();
+  } catch (err) {
+    process.stderr.write(`[trionary] config error: ${err.message}\n`);
+    process.exit(1);
+  }
 
   // Extract optional --db flag from args
   let dbOverride = null;
