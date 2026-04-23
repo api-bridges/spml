@@ -296,3 +296,69 @@ Trionary compiles the `test` blocks to a Jest file (`app.test.js`) alongside you
 - Browse the full [Keyword Reference](KEYWORDS.md)
 - See a complete blog API example in [`examples/blog-api.tri`](../examples/blog-api.tri)
 - Review [Limitations](LIMITATIONS.md) before choosing Trionary for a project
+
+---
+
+## Quick start with SQLite
+
+SQLite is a zero-install, file-based database that is ideal for rapid prototyping and local development. Use `database type sqlite` in your `.tri` file — no external database server is required.
+
+### 1 — Declare the SQLite backend
+
+```tri
+server port 3000
+
+database type sqlite
+
+middleware cors
+middleware logs
+
+route GET /notes
+  find all note sorted by createdAt
+  return notes
+
+route POST /notes
+  take title, content
+  require title
+  create note with title, content
+  return note
+```
+
+### 2 — Build
+
+```bash
+trionary build app.tri
+# ✅ Compiled to app.js
+# ✅ Written schema.prisma
+```
+
+Trionary emits two files:
+
+| File | Purpose |
+|---|---|
+| `app.js` | Compiled Express/Prisma server |
+| `schema.prisma` | Prisma schema with `provider = "sqlite"` and `url = "file:./dev.db"` |
+
+### 3 — Initialise Prisma and run the server
+
+```bash
+npm install @prisma/client express
+npx prisma generate          # generate the Prisma client
+npx prisma db push           # create dev.db and apply the schema
+node app.js
+# Server running on port 3000
+```
+
+A `dev.db` SQLite file is created automatically in the project directory.
+
+### 4 — Switch to SQLite via the CLI flag
+
+You can also force any `.tri` file to use SQLite at build time without modifying the source:
+
+```bash
+trionary build app.tri --db sqlite
+```
+
+> **Tip:** SQLite is intended for development only. Switch to `database type postgres` (or `--db postgres`) when deploying to production.
+
+A full example is available at [`examples/sqlite-api.tri`](../examples/sqlite-api.tri).

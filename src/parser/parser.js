@@ -203,9 +203,9 @@ class Parser {
     if (subToken.type === TOKEN_TYPES.KEYWORD && subToken.value === 'type') {
       this.advance(); // consume 'type'
       const dbTypeToken = this.expect(TOKEN_TYPES.KEYWORD);
-      if (dbTypeToken.value !== 'mongodb' && dbTypeToken.value !== 'postgres') {
+      if (dbTypeToken.value !== 'mongodb' && dbTypeToken.value !== 'postgres' && dbTypeToken.value !== 'sqlite') {
         throw new TrinaryError(
-          `Unknown database type '${dbTypeToken.value}'. Expected 'mongodb' or 'postgres'.`,
+          `Unknown database type '${dbTypeToken.value}'. Expected 'mongodb', 'postgres', or 'sqlite'.`,
           { line: dbTypeToken.line, col: dbTypeToken.col, source: 'parser' },
         );
       }

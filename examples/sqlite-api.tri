@@ -1,0 +1,39 @@
+server port 3000
+
+database type sqlite
+
+middleware cors
+middleware logs
+
+route GET /notes
+  find all note sorted by createdAt
+  return notes
+
+route POST /notes
+  auth required
+  take title, content
+  require title
+  create note with title, content
+  return note
+
+route GET /notes/:id
+  find note by id
+  if not found return error "Note not found" status 404
+  return note
+
+route PUT /notes/:id
+  auth required
+  take title, content
+  update note with title, content
+  return ok
+
+route PATCH /notes/:id
+  auth required
+  take title, content
+  update note with title, content
+  return ok
+
+route DELETE /notes/:id
+  auth required
+  delete note by id
+  return ok

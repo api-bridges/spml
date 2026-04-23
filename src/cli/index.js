@@ -29,6 +29,7 @@ import { resolveImports } from '../compiler/resolve.js';
 // Codegen backends
 import * as mongooseBackend from '../codegen/backends/mongoose.js';
 import * as prismaBackend from '../codegen/backends/prisma.js';
+import * as sqliteBackend from '../codegen/backends/sqlite.js';
 
 // Plugin registry — emitters contributed by third-party plugins
 import { emitters as pluginEmitters, applyKeywords } from '../plugin/index.js';
@@ -94,7 +95,7 @@ function inferModelName(routePath) {
  * Compile a Trionary AST to a Node.js source string.
  *
  * @param {object} ast - Pre-parsed ProgramNode from the Trionary parser.
- * @param {string|null} [dbOverride] - Optional CLI --db flag value ('mongodb'|'postgres').
+ * @param {string|null} [dbOverride] - Optional CLI --db flag value ('mongodb'|'postgres'|'sqlite').
  * @returns {string} Generated Node.js source code.
  */
 export function compileAst(ast, dbOverride = null) {
@@ -103,7 +104,14 @@ export function compileAst(ast, dbOverride = null) {
 
   // Select backend: CLI flag overrides source declaration
   const dbType = dbOverride || ast.dbType || 'mongodb';
-  const backend = dbType === 'postgres' ? prismaBackend : mongooseBackend;
+  let backend;
+  if (dbType === 'postgres') {
+    backend = prismaBackend;
+  } else if (dbType === 'sqlite') {
+    backend = sqliteBackend;
+  } else {
+    backend = mongooseBackend;
+  }
 
   const serverSection = [];
   const listenSection = [];
@@ -144,7 +152,7 @@ export function compileAst(ast, dbOverride = null) {
       }
 
       case 'DatabaseDeclaration': {
-        if (dbType !== 'postgres') {
+        if (dbType !== 'postgres' && dbType !== 'sqlite') {
           addImport('mongoose', 'mongoose');
         }
         dbSection.push(backend.generateDatabase(node));
@@ -212,8 +220,8 @@ export function compileAst(ast, dbOverride = null) {
   const importBlock = generateImports();
   if (importBlock) sections.push(importBlock);
 
-  // For Prisma, prepend the prisma client import + instantiation
-  if (dbType === 'postgres') {
+  // For Prisma-based backends (postgres, sqlite), prepend the prisma client import + instantiation
+  if (dbType === 'postgres' || dbType === 'sqlite') {
     sections.push(prismaBackend.generateModels());
   }
 
@@ -226,7 +234,7 @@ export function compileAst(ast, dbOverride = null) {
   if (middlewareSection.length) sections.push(middlewareSection.join('\n'));
 
   // Emit model definitions between the database connection and route handlers.
-  if (dbType !== 'postgres') {
+  if (dbType !== 'postgres' && dbType !== 'sqlite') {
     const modelsBlock = backend.generateModels(ast);
     if (modelsBlock) sections.push(modelsBlock);
   }
@@ -248,7 +256,7 @@ export function compileAst(ast, dbOverride = null) {
  * Compile a Trionary source string to a Node.js source string.
  *
  * @param {string} source - Raw .tri file contents.
- * @param {string|null} [dbOverride] - Optional database backend override ('mongodb'|'postgres').
+ * @param {string|null} [dbOverride] - Optional database backend override ('mongodb'|'postgres'|'sqlite').
  * @returns {string} Generated Node.js source code.
  */
 export function compile(source, dbOverride = null) {
@@ -345,10 +353,11 @@ async function cmdBuild(filePath, dbOverride = null) {
   // Determine effective db type
   const dbType = dbOverride || ast.dbType || 'mongodb';
 
-  // Emit schema.prisma for PostgreSQL targets
-  if (dbType === 'postgres') {
+  // Emit schema.prisma for Prisma-based targets (postgres and sqlite)
+  if (dbType === 'postgres' || dbType === 'sqlite') {
     const schemaPath = resolve(dirname(outPath), 'schema.prisma');
-    await writeFile(schemaPath, prismaBackend.generatePrismaSchema(ast), 'utf8');
+    const schemaBackend = dbType === 'sqlite' ? sqliteBackend : prismaBackend;
+    await writeFile(schemaPath, schemaBackend.generatePrismaSchema(ast), 'utf8');
     console.log(`✅ Written ${schemaPath}`);
   }
 
@@ -362,7 +371,7 @@ async function cmdBuild(filePath, dbOverride = null) {
       envVars.push(node.envVar);
     }
   }
-  // Always include DATABASE_URL for postgres targets
+  // Always include DATABASE_URL for postgres targets (sqlite uses a fixed file path, no env var needed)
   if (dbType === 'postgres' && !envVars.includes('DATABASE_URL')) {
     envVars.push('DATABASE_URL');
   }
@@ -542,8 +551,8 @@ async function main() {
   if (dbFlagIndex !== -1 && args[dbFlagIndex + 1]) {
     dbOverride = args[dbFlagIndex + 1];
     args.splice(dbFlagIndex, 2);
-    if (dbOverride !== 'mongodb' && dbOverride !== 'postgres') {
-      process.stderr.write(`Error: --db must be 'mongodb' or 'postgres'\n`);
+    if (dbOverride !== 'mongodb' && dbOverride !== 'postgres' && dbOverride !== 'sqlite') {
+      process.stderr.write(`Error: --db must be 'mongodb', 'postgres', or 'sqlite'\n`);
       process.exit(1);
     }
   }
@@ -557,7 +566,7 @@ async function main() {
       case 'build': {
         const file = args[0];
         if (!file) {
-          process.stderr.write('Usage: trionary build <file> [--db <mongodb|postgres>]\n');
+          process.stderr.write('Usage: trionary build <file> [--db <mongodb|postgres|sqlite>]\n');
           process.exit(1);
         }
         await cmdBuild(file, dbOverride);
@@ -567,7 +576,7 @@ async function main() {
       case 'dev': {
         const file = args[0];
         if (!file) {
-          process.stderr.write('Usage: trionary dev <file> [--db <mongodb|postgres>]\n');
+          process.stderr.write('Usage: trionary dev <file> [--db <mongodb|postgres|sqlite>]\n');
           process.exit(1);
         }
         await cmdDev(file, dbOverride);
@@ -586,7 +595,7 @@ async function main() {
 
       default:
         process.stderr.write(
-          'Usage:\n  trionary init\n  trionary build <file> [--db <mongodb|postgres>]\n  trionary dev <file> [--db <mongodb|postgres>]\n  trionary test <file>\n',
+          'Usage:\n  trionary init\n  trionary build <file> [--db <mongodb|postgres|sqlite>]\n  trionary dev <file> [--db <mongodb|postgres|sqlite>]\n  trionary test <file>\n',
         );
         process.exit(1);
     }
