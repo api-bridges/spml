@@ -16,13 +16,14 @@ import { tokenize } from '../lexer/lexer.js';
 import { parse } from '../parser/parser.js';
 import { TrinaryError } from '../errors/TrinaryError.js';
 import { generateServer, generateEnvExample } from '../codegen/server.js';
-import { generateDatabase } from '../codegen/database.js';
 import { generateMiddleware, generateCustomMiddleware, getCustomPackages, resetCustomPackages } from '../codegen/middleware.js';
 import { generateAuthStatements } from '../codegen/auth.js';
 import { generateAuthMiddleware, generateRouteWithAuth } from '../codegen/authMiddleware.js';
-import { generateCrudStatements } from '../codegen/crud.js';
 import { generateImports, resetImports, addImport } from '../codegen/imports.js';
-import { generateModels } from '../codegen/models.js';
+
+// Codegen backends
+import * as mongooseBackend from '../codegen/backends/mongoose.js';
+import * as prismaBackend from '../codegen/backends/prisma.js';
 
 // ---------------------------------------------------------------------------
 // Compiler — tokenize → parse → codegen
@@ -65,9 +66,12 @@ function requiresAuthMiddleware(body) {
 function inferModelName(routePath) {
   const segments = routePath.split('/').filter(Boolean);
   if (!segments.length) return 'item';
-  const first = segments[0].replace(/:[^/]+$/, '');
+  // Strip a leading ':param' segment or param suffix from the first segment
+  const first = segments[0];
+  const colonIdx = first.indexOf(':');
+  const base = colonIdx !== -1 ? first.slice(0, colonIdx) : first;
   // Strip trailing 's' to get singular form
-  return first.endsWith('s') ? first.slice(0, -1) : first;
+  return base.endsWith('s') ? base.slice(0, -1) : base;
 }
 
 /**
@@ -80,11 +84,16 @@ function inferModelName(routePath) {
  * Compile a Trionary AST to a Node.js source string.
  *
  * @param {object} ast - Pre-parsed ProgramNode from the Trionary parser.
+ * @param {string|null} [dbOverride] - Optional CLI --db flag value ('mongodb'|'postgres').
  * @returns {string} Generated Node.js source code.
  */
-export function compileAst(ast) {
+export function compileAst(ast, dbOverride = null) {
   resetImports();
   resetCustomPackages();
+
+  // Select backend: CLI flag overrides source declaration
+  const dbType = dbOverride || ast.dbType || 'mongodb';
+  const backend = dbType === 'postgres' ? prismaBackend : mongooseBackend;
 
   const serverSection = [];
   const listenSection = [];
@@ -109,8 +118,10 @@ export function compileAst(ast) {
       }
 
       case 'DatabaseDeclaration': {
-        addImport('mongoose', 'mongoose');
-        dbSection.push(generateDatabase(node));
+        if (dbType !== 'postgres') {
+          addImport('mongoose', 'mongoose');
+        }
+        dbSection.push(backend.generateDatabase(node));
         break;
       }
 
@@ -133,7 +144,7 @@ export function compileAst(ast) {
           handlerBody = generateAuthStatements(node.body);
         } else {
           const modelName = inferModelName(node.path);
-          handlerBody = generateCrudStatements(node.body, modelName, node.method);
+          handlerBody = backend.generateCrudStatements(node.body, modelName, node.method);
         }
 
         routeSection.push(
@@ -158,6 +169,11 @@ export function compileAst(ast) {
   const importBlock = generateImports();
   if (importBlock) sections.push(importBlock);
 
+  // For Prisma, prepend the prisma client import + instantiation
+  if (dbType === 'postgres') {
+    sections.push(prismaBackend.generateModels());
+  }
+
   if (serverSection.length) sections.push(serverSection.join('\n'));
 
   // Body parser middleware — always inject when express is used
@@ -166,10 +182,11 @@ export function compileAst(ast) {
   if (dbSection.length) sections.push(dbSection.join('\n'));
   if (middlewareSection.length) sections.push(middlewareSection.join('\n'));
 
-  // Emit Mongoose model definitions (inferred from the AST) between the
-  // database connection and the route handlers.
-  const modelsBlock = generateModels(ast);
-  if (modelsBlock) sections.push(modelsBlock);
+  // Emit model definitions between the database connection and route handlers.
+  if (dbType !== 'postgres') {
+    const modelsBlock = backend.generateModels(ast);
+    if (modelsBlock) sections.push(modelsBlock);
+  }
 
   if (needsAuthMiddleware) sections.push(generateAuthMiddleware());
 
@@ -184,12 +201,13 @@ export function compileAst(ast) {
  * Compile a Trionary source string to a Node.js source string.
  *
  * @param {string} source - Raw .tri file contents.
+ * @param {string|null} [dbOverride] - Optional database backend override ('mongodb'|'postgres').
  * @returns {string} Generated Node.js source code.
  */
-export function compile(source) {
+export function compile(source, dbOverride = null) {
   const tokens = tokenize(source);
   const ast = parse(tokens);
-  return compileAst(ast);
+  return compileAst(ast, dbOverride);
 }
 
 // ---------------------------------------------------------------------------
@@ -250,15 +268,17 @@ function outputPath(triPath) {
 }
 
 /**
- * trionary build <file>
+ * trionary build <file> [--db <mongodb|postgres>]
  * Compiles a .tri file and writes the output .js next to it.
  * If the source references any env vars (via `env` keyword), a `.env.example`
  * file is written alongside the compiled output.
+ * For PostgreSQL targets a `schema.prisma` file is emitted.
  *
  * @param {string} filePath
+ * @param {string|null} [dbOverride]
  * @returns {Promise<string>} The resolved output path.
  */
-async function cmdBuild(filePath) {
+async function cmdBuild(filePath, dbOverride = null) {
   const triPath = resolveTriFile(filePath);
 
   if (!existsSync(triPath)) {
@@ -269,11 +289,21 @@ async function cmdBuild(filePath) {
 
   // Parse once; reuse the AST for both compilation and env-var collection
   const ast = parse(tokenize(source));
-  const output = compileAst(ast);
+  const output = compileAst(ast, dbOverride);
   const outPath = outputPath(triPath);
 
   await writeFile(outPath, output, 'utf8');
   console.log(`✅ Compiled to ${outPath}`);
+
+  // Determine effective db type
+  const dbType = dbOverride || ast.dbType || 'mongodb';
+
+  // Emit schema.prisma for PostgreSQL targets
+  if (dbType === 'postgres') {
+    const schemaPath = resolve(dirname(outPath), 'schema.prisma');
+    await writeFile(schemaPath, prismaBackend.generatePrismaSchema(ast), 'utf8');
+    console.log(`✅ Written ${schemaPath}`);
+  }
 
   // Collect env var names referenced in the source
   const envVars = [];
@@ -284,6 +314,10 @@ async function cmdBuild(filePath) {
     if (node.type === 'DatabaseDeclaration' && node.envVar) {
       envVars.push(node.envVar);
     }
+  }
+  // Always include DATABASE_URL for postgres targets
+  if (dbType === 'postgres' && !envVars.includes('DATABASE_URL')) {
+    envVars.push('DATABASE_URL');
   }
 
   if (envVars.length > 0) {
@@ -330,14 +364,15 @@ function startServer(jsPath) {
 }
 
 /**
- * trionary dev <file>
+ * trionary dev <file> [--db <mongodb|postgres>]
  * Builds the .tri file, starts the compiled server, then watches for changes.
  * On each change the server is stopped, the file is rebuilt, and the server
  * is restarted.
  *
  * @param {string} filePath
+ * @param {string|null} [dbOverride]
  */
-async function cmdDev(filePath) {
+async function cmdDev(filePath, dbOverride = null) {
   const triPath = resolveTriFile(filePath);
 
   // Dynamic import of chokidar (ESM-only package)
@@ -345,7 +380,7 @@ async function cmdDev(filePath) {
 
   let jsPath;
   try {
-    jsPath = await cmdBuild(filePath);
+    jsPath = await cmdBuild(filePath, dbOverride);
   } catch (err) {
     handleError(err);
     process.exit(1);
@@ -365,7 +400,7 @@ async function cmdDev(filePath) {
     }
 
     try {
-      jsPath = await cmdBuild(filePath);
+      jsPath = await cmdBuild(filePath, dbOverride);
       serverProcess = startServer(jsPath);
     } catch (err) {
       handleError(err);
@@ -400,6 +435,18 @@ function handleError(err) {
 async function main() {
   const [, , command, ...args] = process.argv;
 
+  // Extract optional --db flag from args
+  let dbOverride = null;
+  const dbFlagIndex = args.indexOf('--db');
+  if (dbFlagIndex !== -1 && args[dbFlagIndex + 1]) {
+    dbOverride = args[dbFlagIndex + 1];
+    args.splice(dbFlagIndex, 2);
+    if (dbOverride !== 'mongodb' && dbOverride !== 'postgres') {
+      process.stderr.write(`Error: --db must be 'mongodb' or 'postgres'\n`);
+      process.exit(1);
+    }
+  }
+
   try {
     switch (command) {
       case 'init':
@@ -409,26 +456,26 @@ async function main() {
       case 'build': {
         const file = args[0];
         if (!file) {
-          process.stderr.write('Usage: trionary build <file>\n');
+          process.stderr.write('Usage: trionary build <file> [--db <mongodb|postgres>]\n');
           process.exit(1);
         }
-        await cmdBuild(file);
+        await cmdBuild(file, dbOverride);
         break;
       }
 
       case 'dev': {
         const file = args[0];
         if (!file) {
-          process.stderr.write('Usage: trionary dev <file>\n');
+          process.stderr.write('Usage: trionary dev <file> [--db <mongodb|postgres>]\n');
           process.exit(1);
         }
-        await cmdDev(file);
+        await cmdDev(file, dbOverride);
         break;
       }
 
       default:
         process.stderr.write(
-          'Usage:\n  trionary init\n  trionary build <file>\n  trionary dev <file>\n',
+          'Usage:\n  trionary init\n  trionary build <file> [--db <mongodb|postgres>]\n  trionary dev <file> [--db <mongodb|postgres>]\n',
         );
         process.exit(1);
     }

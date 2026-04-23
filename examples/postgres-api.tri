@@ -1,0 +1,40 @@
+server port 3000
+
+database type postgres
+database connect env DATABASE_URL
+
+middleware cors
+middleware logs
+
+route GET /products
+  find all product sorted by createdAt
+  return products
+
+route POST /products
+  auth required
+  take name, price, description
+  require name, price
+  create product with name, price, description
+  return product
+
+route GET /products/:id
+  find product by id
+  if not found return error "Product not found" status 404
+  return product
+
+route PUT /products/:id
+  auth required
+  take name, price, description
+  update product with name, price, description
+  return ok
+
+route PATCH /products/:id
+  auth required
+  take name, price, description
+  update product with name, price, description
+  return ok
+
+route DELETE /products/:id
+  auth required
+  delete product by id
+  return ok

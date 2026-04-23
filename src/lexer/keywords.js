@@ -69,4 +69,7 @@ export const KEYWORDS = new Set([
   'one',
   'of',
   'env',
+  'type',
+  'mongodb',
+  'postgres',
 ]);
