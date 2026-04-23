@@ -17,6 +17,7 @@ const FIELD_TYPE_TOKENS = new Map([
   ['Number', TOKEN_TYPES.TYPE_NUMBER],
   ['Boolean', TOKEN_TYPES.TYPE_BOOLEAN],
   ['Date', TOKEN_TYPES.TYPE_DATE],
+  ['env', TOKEN_TYPES.ENV],
 ]);
 
 /**

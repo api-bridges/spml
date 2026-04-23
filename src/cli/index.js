@@ -76,11 +76,14 @@ function inferModelName(routePath) {
  * @param {string} source - Raw .tri file contents.
  * @returns {string} Generated Node.js source code.
  */
-export function compile(source) {
+/**
+ * Compile a Trionary AST to a Node.js source string.
+ *
+ * @param {object} ast - Pre-parsed ProgramNode from the Trionary parser.
+ * @returns {string} Generated Node.js source code.
+ */
+export function compileAst(ast) {
   resetImports();
-
-  const tokens = tokenize(source);
-  const ast = parse(tokens);
 
   const serverSection = [];
   const listenSection = [];
@@ -171,6 +174,18 @@ export function compile(source) {
   return sections.join('\n\n');
 }
 
+/**
+ * Compile a Trionary source string to a Node.js source string.
+ *
+ * @param {string} source - Raw .tri file contents.
+ * @returns {string} Generated Node.js source code.
+ */
+export function compile(source) {
+  const tokens = tokenize(source);
+  const ast = parse(tokens);
+  return compileAst(ast);
+}
+
 // ---------------------------------------------------------------------------
 // Commands
 // ---------------------------------------------------------------------------
@@ -246,10 +261,9 @@ async function cmdBuild(filePath) {
 
   const source = await readFile(triPath, 'utf8');
 
-  // Parse the AST so we can collect referenced env vars before compiling
+  // Parse once; reuse the AST for both compilation and env-var collection
   const ast = parse(tokenize(source));
-
-  const output = compile(source);
+  const output = compileAst(ast);
   const outPath = outputPath(triPath);
 
   await writeFile(outPath, output, 'utf8');
