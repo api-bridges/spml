@@ -22,6 +22,7 @@ import { generateAuthStatements } from '../codegen/auth.js';
 import { generateAuthMiddleware, generateRouteWithAuth } from '../codegen/authMiddleware.js';
 import { generateImports, resetImports, addImport } from '../codegen/imports.js';
 import { generateSocketHandler } from '../codegen/socket.js';
+import { generateJob } from '../codegen/jobs.js';
 import { resolveImports } from '../compiler/resolve.js';
 
 // Codegen backends
@@ -104,6 +105,7 @@ export function compileAst(ast, dbOverride = null) {
   const middlewareSection = [];
   const routeSection = [];
   const socketSection = [];
+  const jobSection = [];
   let needsAuthMiddleware = false;
 
   // Pre-scan: detect whether any SocketNodes are present so we can adjust
@@ -176,6 +178,12 @@ export function compileAst(ast, dbOverride = null) {
         break;
       }
 
+      case 'Job': {
+        addImport('node-cron', 'cron');
+        jobSection.push(generateJob(node));
+        break;
+      }
+
       default:
         break;
     }
@@ -216,6 +224,8 @@ export function compileAst(ast, dbOverride = null) {
   if (routeSection.length) sections.push(routeSection.join('\n\n'));
 
   if (socketSection.length) sections.push(socketSection.join('\n\n'));
+
+  if (jobSection.length) sections.push(jobSection.join('\n\n'));
 
   if (listenSection.length) sections.push(listenSection.join('\n'));
 
@@ -351,8 +361,12 @@ async function cmdBuild(filePath, dbOverride = null) {
     console.log(`✅ Written ${envExamplePath}`);
   }
 
-  // Generate package.json with custom middleware package dependencies
+  // Generate package.json with custom middleware package dependencies and node-cron when needed
   const customPkgs = getCustomPackages();
+  const hasJobNodes = ast.body.some((n) => n.type === 'Job');
+  if (hasJobNodes && !customPkgs.includes('node-cron')) {
+    customPkgs.push('node-cron');
+  }
   if (customPkgs.length > 0) {
     const pkgJsonPath = resolve(dirname(outPath), 'package.json');
     if (existsSync(pkgJsonPath)) {
